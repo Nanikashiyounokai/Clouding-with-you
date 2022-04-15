@@ -1,4 +1,4 @@
-package com.example.dontennkinokoapp
+package com.example.clouding_with_you
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -10,9 +10,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import com.example.clouding_with_you.R
-import com.example.clouding_with_you.RegisterCity
-import com.example.clouding_with_you.SearchMap
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 

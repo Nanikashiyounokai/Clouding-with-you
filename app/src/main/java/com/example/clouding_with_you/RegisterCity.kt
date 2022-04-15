@@ -1,4 +1,4 @@
-package com.example.dontennkinokoapp
+package com.example.clouding_with_you
 
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
@@ -7,7 +7,6 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import com.example.clouding_with_you.R
 
 class RegisterCity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")

@@ -1,10 +1,9 @@
-package com.example.dontennkinokoapp
+package com.example.clouding_with_you
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import com.example.clouding_with_you.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
