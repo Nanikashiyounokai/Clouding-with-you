@@ -1,9 +1,11 @@
 package com.example.clouding_with_you
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import androidx.annotation.RequiresApi
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,5 +36,14 @@ class MainActivity : AppCompatActivity() {
             intent = Intent(this, Detail::class.java)
             startActivity(intent)
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onStart() {
+        super.onStart()
+
+        val intent = Intent(this,GetttingWeatherInformationService::class.java)
+        startForegroundService(intent)
+
     }
 }
