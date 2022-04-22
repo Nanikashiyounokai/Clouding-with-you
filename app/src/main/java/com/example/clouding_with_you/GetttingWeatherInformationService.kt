@@ -58,14 +58,15 @@ class GetttingWeatherInformationService : Service() {
             action = Intent.ACTION_SEND
         }
         val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, 0)
+
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("曇を観測中")
-            .setContentText("終了する場合はこちらから行って下さい。")
+            .setContentText("現在の状況の確認はこの通知をタップ")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
-            .addAction(R.drawable.ic_launcher_foreground, "実行終了", sendPendingIntent)
+            .addAction(R.drawable.ic_launcher_foreground, "観測の終了はこちら", sendPendingIntent)
             .build()
 
         //5．フォアグラウンド開始。
@@ -118,12 +119,14 @@ class GetttingWeatherInformationService : Service() {
         return response
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private  fun weatherJsonTask(result:String) {
         val jsonObj = JSONObject(result)
 
         val weatherJSONArray = jsonObj.getJSONArray("weather")
         val weatherJson = weatherJSONArray.getJSONObject(0)
         val weather = weatherJson.getString("description")
+        val cityName = jsonObj.getString("name")
 
         var notificationId = 0
 //                以下通知に関する記述
@@ -145,14 +148,26 @@ class GetttingWeatherInformationService : Service() {
             notificationManager.createNotificationChannel(channel)
         }
 
+        val openIntent = Intent(this, MainActivity::class.java).let {
+            PendingIntent.getActivity(this, 0, it, 0)
+        }
+
+//        val activityIntent = Intent(this, RegisterCity::class.java).apply {
+//            action = Intent.ACTION_SEND
+//        }
+//        val RegisterCityIntent = PendingIntent.getBroadcast(this, 0, activityIntent, 0)
+
             /// 通知の中身
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_background)    /// 表示されるアイコン
-            .setContentTitle("東京の上空")                  /// 通知タイトル
+            .setContentTitle("${cityName}の上空")                  /// 通知タイトル
             .setContentText("今の天気は${weather}です")           /// 通知コンテンツ
             .setPriority(NotificationCompat.PRIORITY_MAX)   /// 通知の優先度
+            .setContentIntent(openIntent)
+//            .addAction(R.drawable.ic_launcher_foreground, "詳細確認", RegisterCityIntent)
+//            .setAutoCancel(true)
 
-            /// ボタンを押して通知を表示
+        /// ボタンを押して通知を表示
         with(NotificationManagerCompat.from(this)) {
             notify(notificationId, builder.build())
             notificationId += 1
@@ -183,6 +198,16 @@ class GetttingWeatherInformationService : Service() {
 //                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 //                notificationManager.createNotificationChannel(channel)
 //            }
+
+    //        val openIntent = Intent(this, MainActivity::class.java).let {
+    //            PendingIntent.getActivity(this, 0, it, 0)
+    //        }
+
+    //        val activityIntent = Intent(this, RegisterCity::class.java).apply {
+    //            action = Intent.ACTION_SEND
+    //        }
+    //        val RegisterCityIntent = PendingIntent.getBroadcast(this, 0, activityIntent, 0)
+
 //
 //            /// 通知の中身
 //            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -190,6 +215,9 @@ class GetttingWeatherInformationService : Service() {
 //                .setContentTitle("東京の上空")                  /// 通知タイトル
 //                .setContentText("今から曇るよ")           /// 通知コンテンツ
 //                .setPriority(NotificationCompat.PRIORITY_MAX)   /// 通知の優先度
+//                .setContentIntent(openIntent)
+//                .addAction(R.drawable.ic_launcher_foreground, "詳細確認", RegisterCityIntent)
+//                 .setAutoCancel(true)
 //
 //            /// ボタンを押して通知を表示
 //            with(NotificationManagerCompat.from(this)) {
