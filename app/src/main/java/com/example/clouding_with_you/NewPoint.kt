@@ -17,13 +17,17 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 class NewPoint : AppCompatActivity() {
+
+//    位置情報を得るための変数
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
+    //    Activityの生成
     @SuppressLint("VisibleForTests")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_point)
 
+//        変数の定義
         val etCityName : EditText = findViewById(R.id.etCityName)
         val etLat : EditText = findViewById(R.id.etLat)
         val etLng : EditText = findViewById(R.id.etLng)
@@ -31,20 +35,33 @@ class NewPoint : AppCompatActivity() {
         val btnRegister : Button = findViewById(R.id.btnRegister)
         val btnCurrentLocation : Button = findViewById(R.id.btnCurrentLocation)
 
+//        新規登録ボタンを押した時の処理
         btnRegister.setOnClickListener {
+
+//            新規地点登録を押せるかどうか、入力状況から条件分岐
             if (etCityName.text.toString() == "" || etLat.text.toString() == "" || etLng.text.toString() == ""){
+
+//                全てが入力されていない場合の表示
                 AlertDialog.Builder(this)
                     .setTitle("ERROR!!")
                     .setMessage("全ての項目を入力")
                     .setPositiveButton("OK",null)
                     .show()
             }else{
+
+//                入力されている時の処理
                 AlertDialog.Builder(this)
                     .setTitle("地点登録完了")
                     .setMessage("新規地点登録が完了しました")
+//                        「登録地点を見る」を押した時の処理
                     .setPositiveButton("登録地点を見る") { _, _ ->
+
+//                        "RegisterCity.kt"への画面遷移
                         val intent = Intent(this, RegisterCity::class.java)
 
+//                        今はないけど、入力データをデータベースにも飛ばしたい
+
+//                        入力データを画面遷移先で参照するためのキーの定義
                         intent.putExtra("Register_CityName", etCityName.text.toString())
                         intent.putExtra("Register_Lat", etLat.text.toString())
                         intent.putExtra("Register_Lng", etLng.text.toString())
@@ -52,46 +69,51 @@ class NewPoint : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     }
+//                        「タイトルに戻る」を押した時の処理
                     .setNegativeButton("タイトルに戻る"){ _, _ ->
+
+//                        "MainActivity.kt"への画面遷移
                         val intent = Intent(this, MainActivity::class.java)
 
-//                        intent.putExtra("Register_CityName", etCityName.text.toString())
-//                        intent.putExtra("Register_Lat", etLat.text.toString())
-//                        intent.putExtra("Register_Lng", etLng.text.toString())
-//                        登録地点に送れない
-
+//                        今はないけど、データベースにも入力内容は送信したい
                         startActivity(intent)
                         finish()
                     }
                     .show()
             }
         }
+
+//        地図から参照を押した他時の処理
         btnMap.setOnClickListener {
+
+//            "SearchMap.kt"への画面遷移
             val intent = Intent(this, SearchMap::class.java)
             startActivity(intent)
         }
 
-//        setContentView(R.layout.activity_main)
+//        現在地を参照するために必要なやつ（権限ではない、よくわからない）
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
+//        現在地を参照を押した時
         btnCurrentLocation.setOnClickListener {
+
+//            fetchLocation関数の実行
             fetchLocation()
         }
 
+//        入力中にキーボードをしまいたい（よくわからん、未完）
         etCityName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
             }
         }
-
         etLat.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
             }
         }
-
         etLng.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -100,9 +122,11 @@ class NewPoint : AppCompatActivity() {
         }
     }
 
+//    現在地を参照するための関数
     private fun fetchLocation() {
         val task = fusedLocationProviderClient.lastLocation
 
+//        スマホへの位置情報へアクセスするための権限の確認
         if(ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED && ActivityCompat
                 .checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -111,10 +135,15 @@ class NewPoint : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),101)
             return
         }
+
+//        緯度と経度の呼び出し及び入力
         task.addOnSuccessListener {
+
+//            変数の定義
             val etLat : EditText = findViewById(R.id.etLat)
             val etLng : EditText = findViewById(R.id.etLng)
 
+//            経緯のEditTextに入力
             if(it !=null){
                 etLat.setText(it.latitude.toString(), TextView.BufferType.EDITABLE)
                 etLng.setText(it.longitude.toString(), TextView.BufferType.EDITABLE)
@@ -122,6 +151,7 @@ class NewPoint : AppCompatActivity() {
         }
     }
 
+//    キーボードをしまうための関数（よくわからん、未完）
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         val focusView : TextView = findViewById(R.id.focusView)
         focusView.requestFocus()

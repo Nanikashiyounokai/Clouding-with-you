@@ -23,22 +23,30 @@ import java.net.URL
 import java.util.*
 import kotlin.concurrent.schedule
 
+//アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
 class GetttingWeatherInformationService : Service() {
 
+//    クラス内に作成されるSingletonがcompanion object
+//    クラス内のインスタンスがただ1つだけ存在する状態にしたいのがSingleton
+//    つまりここで何をやってるかはよくわからない
     companion object {
         const val CHANNEL_ID = "1111"
     }
 
+//    他のActivityがサービスにバインドするときにbindService()を呼び出した際の処理
+//    この「バインド」ってのはよくわからないが今回は特に必要なさそう、？
+//    ただ今回はバインドを許可してないらしい
+//    かと言って、下のonBindの部分を削除するとAndroidStudioに怒られます
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
+//    他のActivityがサービスの開始をリクエストした際の処理
     @SuppressLint("UnspecifiedImmutableFlag")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("Service", "onStartCommand called")
 
-        //1．通知領域タップで戻ってくる先のActivity
+        //1．常時通知されている通知領域をタップした時に戻ってくる先のActivity
         val openIntent = Intent(this, MainActivity::class.java).let {
             PendingIntent.getActivity(this, 0, it, 0)
         }
@@ -54,6 +62,9 @@ class GetttingWeatherInformationService : Service() {
         manager.createNotificationChannel(channel)
 
         //3．ブロードキャストレシーバーをPendingIntent化
+//    ブロードキャストとは端末がアプリ向けに発信している様々なメッセージや情報を発信すること
+//    ブロードキャストレシーバーとは自分で情報（インテント）を発信（ブロードキャスト）して受信すること
+//    PendingIntent化とはintentを予約して指定したタイミングで発行すること
         val sendIntent = Intent(this, GetttingWeatherInformationReceiver::class.java).apply {
             action = Intent.ACTION_SEND
         }
@@ -72,69 +83,104 @@ class GetttingWeatherInformationService : Service() {
         //5．フォアグラウンド開始。
         startForeground(2222, notification)
 
+//        データベースから緯度経度参照
+//        緯度経度を入力として曇を通知
+
+//    繰り返し通知するための時間設定（現在はServiceが開始してから30分ごと）
         val notificationInterval: TimerTask.() -> Unit = {
+
+//            APIキーを含むURLを入力して天気の情報を受け取る関数
             gettingWeatherInformation()
         }
         Timer().schedule(0, 1800000, notificationInterval)
 
+//    システムがサービスを強制終了した場合に、サービスをどのように続行するかを示す
+//    これは「強制終了した場合、サービスを再作成しonStartCommand() を呼び出すが、最後のインテントは再配信しない。
+//    コマンドは実行しないが、無期限に動作し、ジョブを待機するメディア プレーヤー（または同様のサービス）に適している。」
+//    とAndroid デベロッパーが言ってました
         return START_STICKY
     }
 
+//    サービスの終了（GetttingWeatherInformationReceiver.ktで呼び出してる）
     override fun stopService(name: Intent?): Boolean {
         return super.stopService(name)
     }
 
+
+//    各ライフサイクル内で使う関数の定義
+
+//    APIキーを含むURLを入力して天気の情報を受け取る関数
     private fun gettingWeatherInformation() {
 
-//        Howcangのお天気アプリに似た機能を以下に記述
+//    APIキーを含むURLの定義
         val apiKey = "f88bde919fb0a4b898de3a29d6f0c421"
         val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
-
         val weatherUrl = "$mainURL&q=tokyo&appid=$apiKey"
+
+//    weatherTask関数にURLを入力
         weatherTask(weatherUrl)
     }
 
+//    URLの検索及び、検索した結果の処理の関数（コルーチンを始める）
     private fun weatherTask(weatherUrl:String) {
         GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT){
+
+//            入力されたURLの検索
             val result = weatherBackgroundTask(weatherUrl)
+
+//            weatherJsonTask関数で、URLを検索した結果のJSON形式のデータを処理
             weatherJsonTask(result)
         }
     }
 
+//    入力されたURLの検索
     private suspend fun weatherBackgroundTask(weatherUrl:String):String{
+
+//        入力されたURLの検索
         val response = withContext(Dispatchers.IO){
             var httpResult = ""
+
+//            とりあえず入力されたURLを検索してみる
             try {
                 val urlObj = URL(weatherUrl)
                 val br = BufferedReader(InputStreamReader(urlObj.openStream()))
                 httpResult = br.readText()
 
+//            検索できなかった時の処理
             }catch (e: IOException){
                 e.printStackTrace()
             }catch (e: JSONException){
                 e.printStackTrace()
             }
+
+//            "response"に"httpResult"を返す
             return@withContext httpResult
         }
+
+//        "weatherBackgroundTask"の戻り値に"response"(＝"httpResult")を返す
         return response
     }
 
+//    天気の情報が入ったJSON形式のデータの処理及びその内容を通知する関数
     @SuppressLint("UnspecifiedImmutableFlag")
     private  fun weatherJsonTask(result:String) {
+
+//    変数の定義
         val jsonObj = JSONObject(result)
 
+//    JSONデータから"cityName"と"weather"の取り出し
         val weatherJSONArray = jsonObj.getJSONArray("weather")
         val weatherJson = weatherJSONArray.getJSONObject(0)
         val weather = weatherJson.getString("description")
         val cityName = jsonObj.getString("name")
 
+//    通知をするための準備
         var notificationId = 0
-//                以下通知に関する記述
         val CHANNEL_ID = "channel_id"
         val channel_name = "channel_name"
         val channel_description = "channel_description "
 
-            ///APIレベルに応じてチャネルを作成
+//    APIレベルに応じた通知チャンネルの作成（よくわかってない）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = channel_name
             val descriptionText = channel_description
@@ -148,31 +194,36 @@ class GetttingWeatherInformationService : Service() {
             notificationManager.createNotificationChannel(channel)
         }
 
+//    天気の通知をタップした時に画面遷移するための準備
         val openIntent = Intent(this, MainActivity::class.java).let {
             PendingIntent.getActivity(this, 0, it, 0)
         }
 
+//    天気の通知の詳細をみるために"RegisterCity"に画面遷移するための準備（よくわからない、未実装）
 //        val activityIntent = Intent(this, RegisterCity::class.java).apply {
 //            action = Intent.ACTION_SEND
 //        }
 //        val RegisterCityIntent = PendingIntent.getBroadcast(this, 0, activityIntent, 0)
 
-            /// 通知の中身
+//    通知の詳細
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_background)    /// 表示されるアイコン
-            .setContentTitle("${cityName}の上空")                  /// 通知タイトル
-            .setContentText("今の天気は${weather}です")           /// 通知コンテンツ
-            .setPriority(NotificationCompat.PRIORITY_MAX)   /// 通知の優先度
-            .setContentIntent(openIntent)
+            .setSmallIcon(R.drawable.ic_launcher_background)  /// 表示されるアイコン
+            .setContentTitle("${cityName}の上空")              /// 通知タイトル
+            .setContentText("今の天気は${weather}です")         /// 通知コンテンツ
+            .setPriority(NotificationCompat.PRIORITY_MAX)    /// 通知の優先度
+            .setContentIntent(openIntent)                    /// 天気の通知をタップした時に画面遷移
 //            .addAction(R.drawable.ic_launcher_foreground, "詳細確認", RegisterCityIntent)
-//            .setAutoCancel(true)
+                                                             /// この通知にボタンを追加する
+//            .setAutoCancel(true)                           /// 何らかで画面遷移した時にこの通知を消す
 
-        /// ボタンを押して通知を表示
+//    通知のビルド
         with(NotificationManagerCompat.from(this)) {
             notify(notificationId, builder.build())
             notificationId += 1
         }
 
+
+//    以下曇の時に通知が出るように条件分岐した場合のコード
 
 //        var notificationId = 0   /// notificationID
 //        if(weather == "薄い雲"||
