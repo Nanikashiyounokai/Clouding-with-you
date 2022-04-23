@@ -16,6 +16,7 @@ class SearchMap : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivitySearchMapBinding
 
+    //    Activityの生成
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -41,9 +42,9 @@ class SearchMap : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(35.68944,139.69167)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Tokyo"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,8f))
+        val tokyo = LatLng(35.68944,139.69167)
+        mMap.addMarker(MarkerOptions().position(tokyo).title("Marker in Tokyo"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tokyo,8f))
         mMap.uiSettings.isZoomControlsEnabled = true
     }
 }
