@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 class MainActivity : AppCompatActivity() {
 
 //    Activityの生成
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -51,16 +52,11 @@ class MainActivity : AppCompatActivity() {
             intent = Intent(this, Detail::class.java)
             startActivity(intent)
         }
+
+//    アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
+//    フォアグラウンド処理（アプリ）の実行命令（"GetttingWeatherInformationService.kt"に遷移）
+        val intentService = Intent(this,GetttingWeatherInformationService::class.java)
+        startForegroundService(intentService)
     }
 
-//    Activityの開始
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onStart() {
-        super.onStart()
-
-//    　アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
-//      フォアグラウンド処理（アプリ）の実行命令（"GetttingWeatherInformationService.kt"に遷移）
-        val intent = Intent(this,GetttingWeatherInformationService::class.java)
-        startForegroundService(intent)
-    }
 }

@@ -1,9 +1,11 @@
 package com.example.clouding_with_you
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +26,7 @@ class RegisterCity : AppCompatActivity() {
 //        変数の定義
         val tvNothing: TextView = findViewById(R.id.tvNothing)
         val lvRegisterCity: ListView = findViewById(R.id.lvRegisterCity)
+        val btnNewPointFronReg : Button = findViewById(R.id.btnNewPointFronReg)
 
 //        Listを表示するためのadapterの定義
         val adapter = ArrayAdapter<String>(
@@ -55,6 +58,14 @@ class RegisterCity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
                 }
                 .show()
+        }
+
+//        「新規地点登録画面へ移動」を押した時の処理
+        btnNewPointFronReg.setOnClickListener {
+
+//            "NewPoint.kt"に画面遷移
+            intent = Intent(this, NewPoint::class.java)
+            startActivity(intent)
         }
     }
 }
