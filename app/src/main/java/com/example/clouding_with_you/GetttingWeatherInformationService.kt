@@ -114,8 +114,13 @@ class GetttingWeatherInformationService : Service() {
 
 //    APIキーを含むURLの定義
         val apiKey = "f88bde919fb0a4b898de3a29d6f0c421"
-        val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
-        val weatherUrl = "$mainURL&q=tokyo&appid=$apiKey"
+        val mainURL ="https://api.openweathermap.org/data/2.5/onecall?units=metric&lang=ja"
+        val lat = 139.77 //経度を代入（仮に東京を代入）
+        val lon = 35.68  //緯度を代入（仮に東京を代入）
+        val mapDisplay = "lat=$lat&lon=$lon"
+        val weatherUrl = "$mainURL&$mapDisplay&appid=$apiKey"
+        //val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
+        //val weatherUrl = "$mainURL&q=tokyo&appid=$apiKey"
 
 //    weatherTask関数にURLを入力
         weatherTask(weatherUrl)
@@ -166,13 +171,38 @@ class GetttingWeatherInformationService : Service() {
     private  fun weatherJsonTask(result:String) {
 
 //    変数の定義
-        val jsonObj = JSONObject(result)
+    val jsonObj = JSONObject(result)
+
+    //現在の雲量を取得
+    val weatherNowJSONObject = jsonObj.getJSONObject("current")
+    val nowClouds = weatherNowJSONObject.getInt("clouds")
+
+    //未来の雲量を取得
+    val weatherFutureJSONArray = jsonObj.getJSONArray("hourly")
+    val weatherFutureJSONObject = weatherFutureJSONArray.getJSONObject(1)
+    val futureClouds = weatherFutureJSONObject.getInt("clouds")
+
+    //何分後かを計算
+    val nowTime = weatherNowJSONObject.getInt("dt")
+    val futureTime = weatherNowJSONObject.getInt("dt")
+    val minute: Int = (futureTime - nowTime) / 60
 
 //    JSONデータから"cityName"と"weather"の取り出し
-        val weatherJSONArray = jsonObj.getJSONArray("weather")
-        val weatherJson = weatherJSONArray.getJSONObject(0)
-        val weather = weatherJson.getString("description")
-        val cityName = jsonObj.getString("name")
+//        val weatherJSONArray = jsonObj.getJSONArray("weather")
+//        val weatherJson = weatherJSONArray.getJSONObject(0)
+//        val weather = weatherJson.getString("description")
+//        val cityName = jsonObj.getString("name")
+
+//        //曇り率計算（全て少数型で計算）
+//        val cloudingRate:Double = (futureClouds.toDouble()-nowClouds.toDouble())/minute.toDouble()
+//        //曇り率に応じてメッセージを分岐(1.0は仮代入)
+//        if (cloudingRate >= 1.0){
+//           val message = "ねぇ、今から曇るよ"
+//        }else if (nowClouds <= 75){
+//           val message = "ねぇ、この空が曇ってほしいと思う？"
+//        }else if (nowClouds > 75){
+//           val message = "青空よりも俺は曇天がいい！天気なんて曇ったままでいいんだ！」"
+//        }
 
 //    通知をするための準備
         var notificationId = 0
@@ -208,8 +238,9 @@ class GetttingWeatherInformationService : Service() {
 //    通知の詳細
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_background)  /// 表示されるアイコン
-            .setContentTitle("${cityName}の上空")              /// 通知タイトル
-            .setContentText("今の天気は${weather}です")         /// 通知コンテンツ
+            .setContentTitle("東京の上空")                     /// 通知タイトル（仮に東京を代入）
+            .setContentText("現在の雲量は${nowClouds},${minute}分後の雲量は${futureClouds},")  /// 通知コンテンツ
+            //.setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_MAX)    /// 通知の優先度
             .setContentIntent(openIntent)                    /// 天気の通知をタップした時に画面遷移
 //            .addAction(R.drawable.ic_launcher_foreground, "詳細確認", RegisterCityIntent)
@@ -276,5 +307,6 @@ class GetttingWeatherInformationService : Service() {
 //                notificationId += 1
 //            }
 //        }
+
     }
 }
