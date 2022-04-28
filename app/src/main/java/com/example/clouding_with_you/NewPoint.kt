@@ -19,7 +19,11 @@ import com.google.android.gms.location.LocationServices
 class NewPoint : AppCompatActivity() {
 
 //    位置情報を得るための変数
-    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+//    全体で使う変数の定義
+//    private val etCityName : EditText = findViewById(R.id.etCityName)
+//    private val etLat : EditText = findViewById(R.id.etLat)
+//    private val etLng : EditText = findViewById(R.id.etLng)
 
     //    Activityの生成
     @SuppressLint("VisibleForTests")
@@ -49,37 +53,60 @@ class NewPoint : AppCompatActivity() {
                     .show()
             }else{
 
-//                入力されている時の処理
-                AlertDialog.Builder(this)
-                    .setTitle("地点登録完了")
-                    .setMessage("新規地点登録が完了しました")
-//                        「登録地点を見る」を押した時の処理
-                    .setPositiveButton("登録地点を見る") { _, _ ->
+//                緯度の範囲を確認
+                if(etLat.text.toString().toDouble() <= -90.0 || 90.0 <= etLat.text.toString().toDouble()){
 
-//                        "RegisterCity.kt"への画面遷移
-                        val intent = Intent(this, RegisterCity::class.java)
+//                    緯度が不適切な値の時の表示
+                    AlertDialog.Builder(this)
+                        .setTitle("ERROR!!")
+                        .setMessage("緯度は-90度から90度の範囲で入力してください")
+                        .setPositiveButton("OK",null)
+                        .show()
+                }else{
+//                    経度の範囲の確認
+                    if(etLng.text.toString().toDouble() <= -180.0 || 180.0 <= etLng.text.toString().toDouble()){
 
-//                        今はないけど、入力データをデータベースにも飛ばしたい
+//                    経度が不適切な値の時の表示
+                        AlertDialog.Builder(this)
+                            .setTitle("ERROR!!")
+                            .setMessage("経度は-180度から180度の範囲で入力してください")
+                            .setPositiveButton("OK",null)
+                            .show()
+                    }else{
 
-//                        入力データを画面遷移先で参照するためのキーの定義
-                        intent.putExtra("Register_CityName", etCityName.text.toString())
-                        intent.putExtra("Register_Lat", etLat.text.toString())
-                        intent.putExtra("Register_Lng", etLng.text.toString())
+//                        全て正しい時の表示
+                        AlertDialog.Builder(this)
+                            .setTitle("地点登録完了")
+                            .setMessage("新規地点登録が完了しました")
+//                                「登録地点を見る」を押した時の処理
+                            .setPositiveButton("登録地点を見る") { _, _ ->
 
-                        startActivity(intent)
-                        finish()
+//                                "RegisterCity.kt"への画面遷移
+                                val intent = Intent(this, RegisterCity::class.java)
+
+//                                今はないけど、入力データをデータベースにも飛ばしたい
+
+//                                入力データを画面遷移先で参照するためのキーの定義
+                                intent.putExtra("Register_CityName", etCityName.text.toString())
+                                intent.putExtra("Register_Lat", etLat.text.toString())
+                                intent.putExtra("Register_Lng", etLng.text.toString())
+
+                                startActivity(intent)
+                                finish()
+                            }
+//                                「タイトルに戻る」を押した時の処理
+                            .setNegativeButton("タイトルに戻る"){ _, _ ->
+
+//                                "MainActivity.kt"への画面遷移
+                                val intent = Intent(this, MainActivity::class.java)
+
+//                                 今はないけど、データベースにも入力内容は送信したい
+                                startActivity(intent)
+                                finish()
+                            }
+                            .show()
                     }
-//                        「タイトルに戻る」を押した時の処理
-                    .setNegativeButton("タイトルに戻る"){ _, _ ->
-
-//                        "MainActivity.kt"への画面遷移
-                        val intent = Intent(this, MainActivity::class.java)
-
-//                        今はないけど、データベースにも入力内容は送信したい
-                        startActivity(intent)
-                        finish()
-                    }
-                    .show()
+                }
             }
         }
 
