@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -114,13 +113,15 @@ class GetttingWeatherInformationService : Service() {
 
 //    APIキーを含むURLの定義
         val apiKey = "f88bde919fb0a4b898de3a29d6f0c421"
-        val mainURL ="https://api.openweathermap.org/data/2.5/onecall?units=metric&lang=ja"
         val lat = 139.77 //経度を代入（仮に東京を代入）
         val lon = 35.68  //緯度を代入（仮に東京を代入）
         val mapDisplay = "lat=$lat&lon=$lon"
-        val weatherUrl = "$mainURL&$mapDisplay&appid=$apiKey"
+        val weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?$mapDisplay&units=metric&lang=ja&appid=$apiKey"
         //val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
         //val weatherUrl = "$mainURL&q=tokyo&appid=$apiKey"
+
+//    最終的なURLの全貌
+//    https://api.openweathermap.org/data/2.5/onecall?lat=30.489772&lon=-99.771335&units=metric&lang=ja&appid=f88bde919fb0a4b898de3a29d6f0c421
 
 //    weatherTask関数にURLを入力
         weatherTask(weatherUrl)
@@ -128,6 +129,7 @@ class GetttingWeatherInformationService : Service() {
 
 //    URLの検索及び、検索した結果の処理の関数（コルーチンを始める）
     private fun weatherTask(weatherUrl:String) {
+
         GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT){
 
 //            入力されたURLの検索
@@ -186,6 +188,7 @@ class GetttingWeatherInformationService : Service() {
     val nowTime = weatherNowJSONObject.getInt("dt")
     val futureTime = weatherNowJSONObject.getInt("dt")
     val minute: Int = (futureTime - nowTime) / 60
+//    val minute: Int = (50 - 10) / 60
 
 //    JSONデータから"cityName"と"weather"の取り出し
 //        val weatherJSONArray = jsonObj.getJSONArray("weather")
@@ -201,7 +204,7 @@ class GetttingWeatherInformationService : Service() {
 //        }else if (nowClouds <= 75){
 //           val message = "ねぇ、この空が曇ってほしいと思う？"
 //        }else if (nowClouds > 75){
-//           val message = "青空よりも俺は曇天がいい！天気なんて曇ったままでいいんだ！」"
+//           val message = "青空よりも俺は曇天がいい！天気なんて曇ったままでいいんだ！"
 //        }
 
 //    通知をするための準備

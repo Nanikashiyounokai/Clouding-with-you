@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Clouding-with-you</string>
+    <string name="app_name">曇天気の子</string>
     <string name="tvTitle">曇天気の子</string>
     <string name="tvSubTitle">今から曇るよ</string>
     <string name="btnNewPoint">新規地点登録</string>
