@@ -113,8 +113,8 @@ class GetttingWeatherInformationService : Service() {
 
 //    APIキーを含むURLの定義
         val apiKey = "f88bde919fb0a4b898de3a29d6f0c421"
-        val lat = 139.77 //経度を代入（仮に東京を代入）
-        val lon = 35.68  //緯度を代入（仮に東京を代入）
+        val lon = 139.77 //経度を代入（仮に東京を代入）
+        val lat = 35.68  //緯度を代入（仮に東京を代入）
         val mapDisplay = "lat=$lat&lon=$lon"
         val weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?$mapDisplay&units=metric&lang=ja&appid=$apiKey"
         //val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
