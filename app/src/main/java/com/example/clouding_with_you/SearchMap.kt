@@ -1,8 +1,10 @@
 package com.example.clouding_with_you
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
+import android.view.View
+import android.widget.Button
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -10,6 +12,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.clouding_with_you.databinding.ActivitySearchMapBinding
+//アイコンカラー
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 class SearchMap : AppCompatActivity(), OnMapReadyCallback {
 
@@ -40,11 +44,48 @@ class SearchMap : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        //ボタンの非表示
+        val btnDecision : Button = findViewById(R.id.btnDecision)
+        btnDecision.visibility = View.INVISIBLE
 
-        // Add a marker in Sydney and move the camera
-        val tokyo = LatLng(35.68944,139.69167)
-        mMap.addMarker(MarkerOptions().position(tokyo).title("Marker in Tokyo"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tokyo,8f))
-        mMap.uiSettings.isZoomControlsEnabled = true
+        var lat = 35.6809591
+        var lng = 139.7673068
+        //1)東京を表示
+        val locationNow = LatLng(lat, lng)
+        //クリック関数の中で書き換えるのでvar
+        var marker = mMap.addMarker(MarkerOptions()
+            .position(locationNow)
+            .title("東京駅"))
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationNow,10f)) //2)zoom表示
+        mMap.uiSettings.isZoomControlsEnabled =true //3)拡大・縮小ボタン表示
+
+        //クリックしたところにマーカー追加
+        mMap.setOnMapClickListener(object :GoogleMap.OnMapClickListener{
+            override fun onMapClick(p0: LatLng) {
+                marker!!.setVisible(false)
+                lat = p0.latitude
+                lng = p0.longitude
+                val location = LatLng(lat,lng)
+                marker = mMap.addMarker(MarkerOptions().position(location).title("新規登録地点"))
+                //ボタンの表示
+                btnDecision.visibility = View.VISIBLE
+            }
+        })
+
+        btnDecision.setOnClickListener {
+            val decisionLat = (Math.round(lat * 10000)).toDouble()/10000
+            val decisionLng = (Math.round(lng * 10000)).toDouble()/10000
+
+            //"NewPoint.kt"に画面遷移
+            val intent = Intent(this, NewPoint::class.java)
+            //NewPointに緯度経度を渡す。
+            intent.putExtra("Decision_Lat", decisionLat.toString())
+            intent.putExtra("Decision_Lng", decisionLng.toString())
+            startActivity(intent)
+            finish()
+        }
+
+
     }
 }

@@ -31,6 +31,10 @@ class NewPoint : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_point)
 
+        //intentされてきた変数の所得
+        val decisionLng = intent.getStringExtra("Decision_Lng")
+        val decisionLat = intent.getStringExtra("Decision_Lat")
+
 //        変数の定義
         val etCityName : EditText = findViewById(R.id.etCityName)
         val etLat : EditText = findViewById(R.id.etLat)
@@ -38,6 +42,11 @@ class NewPoint : AppCompatActivity() {
         val btnMap : Button = findViewById(R.id.btnMap)
         val btnRegister : Button = findViewById(R.id.btnRegister)
         val btnCurrentLocation : Button = findViewById(R.id.btnCurrentLocation)
+
+        if(decisionLng != null && decisionLat != null){
+            etLat.setText(decisionLat)
+            etLng.setText(decisionLng)
+        }
 
 //        新規登録ボタンを押した時の処理
         btnRegister.setOnClickListener {
@@ -170,10 +179,13 @@ class NewPoint : AppCompatActivity() {
             val etLat : EditText = findViewById(R.id.etLat)
             val etLng : EditText = findViewById(R.id.etLng)
 
+            val inputLat = (Math.round(it.latitude  * 10000)).toDouble()/10000
+            val inputLng = (Math.round(it.longitude * 10000)).toDouble()/10000
+
 //            経緯のEditTextに入力
             if(it !=null){
-                etLat.setText(it.latitude.toString(), TextView.BufferType.EDITABLE)
-                etLng.setText(it.longitude.toString(), TextView.BufferType.EDITABLE)
+                etLat.setText(inputLat.toString(), TextView.BufferType.EDITABLE)
+                etLng.setText(inputLng.toString(), TextView.BufferType.EDITABLE)
             }
         }
     }

@@ -186,7 +186,7 @@ class GetttingWeatherInformationService : Service() {
 
     //何分後かを計算
     val nowTime = weatherNowJSONObject.getInt("dt")
-    val futureTime = weatherNowJSONObject.getInt("dt")
+    val futureTime = weatherFutureJSONObject.getInt("dt")
     val minute: Int = (futureTime - nowTime) / 60
 //    val minute: Int = (50 - 10) / 60
 
