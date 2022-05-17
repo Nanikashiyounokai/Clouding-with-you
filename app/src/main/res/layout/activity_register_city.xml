@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterCity">
+    tools:context=".RegisterCity"
+    android:background="@drawable/gradient_background">
 
     <TextView
         android:id="@+id/tvNothing"
@@ -21,7 +22,7 @@
         android:id="@+id/btnNewPointFronReg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="650dp"
+        android:layout_marginTop="500dp"
         android:text="@string/btnNewPointFromReg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,5 +35,20 @@
         tools:layout_editor_absoluteX="127dp"
         tools:layout_editor_absoluteY="294dp">
     </ListView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <!--    実際の広告IDは以下"ca-app-pub-2529783942153390/2722707931"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
