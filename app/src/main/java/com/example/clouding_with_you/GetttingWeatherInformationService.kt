@@ -71,12 +71,12 @@ class GetttingWeatherInformationService : Service() {
 
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.notification_icon)
             .setContentTitle("曇を観測中")
             .setContentText("現在の状況の確認はこの通知をタップ")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
-            .addAction(R.drawable.ic_launcher_foreground, "観測の終了はこちら", sendPendingIntent)
+            .addAction(R.drawable.notification_icon, "観測の終了はこちら", sendPendingIntent)
             .build()
 
         //5．フォアグラウンド開始。
@@ -240,7 +240,7 @@ class GetttingWeatherInformationService : Service() {
 
 //    通知の詳細
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_background)  /// 表示されるアイコン
+            .setSmallIcon(R.drawable.notification_icon)  /// 表示されるアイコン
             .setContentTitle("東京の上空")                     /// 通知タイトル（仮に東京を代入）
             .setContentText("現在の雲量は${nowClouds},${minute}分後の雲量は${futureClouds},")  /// 通知コンテンツ
             //.setContentText(message)

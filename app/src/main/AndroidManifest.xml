@@ -53,6 +53,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyACVKP_nGLz4QUUpu0nm5q-Pz5J4Nm8_hc" />
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2529783942153390~8957492535"/>
+
         <activity
             android:name=".SearchMap"
             android:exported="true"

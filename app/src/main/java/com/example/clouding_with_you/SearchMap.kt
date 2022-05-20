@@ -1,19 +1,18 @@
 package com.example.clouding_with_you
 
+//アイコンカラー
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import com.example.clouding_with_you.databinding.ActivitySearchMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.clouding_with_you.databinding.ActivitySearchMapBinding
-//アイコンカラー
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 class SearchMap : AppCompatActivity(), OnMapReadyCallback {
 
@@ -88,4 +87,9 @@ class SearchMap : AppCompatActivity(), OnMapReadyCallback {
 
 
     }
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
 }

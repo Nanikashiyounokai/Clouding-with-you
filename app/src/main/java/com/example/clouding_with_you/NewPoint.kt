@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
@@ -12,11 +11,17 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 class NewPoint : AppCompatActivity() {
+
+    lateinit var mAdView : AdView
 
 //    位置情報を得るための変数
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -30,6 +35,12 @@ class NewPoint : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_point)
+
+        MobileAds.initialize(this) {}
+
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         //intentされてきた変数の所得
         val decisionLng = intent.getStringExtra("Decision_Lng")
@@ -101,6 +112,7 @@ class NewPoint : AppCompatActivity() {
                                 intent.putExtra("Register_Lng", etLng.text.toString())
 
                                 startActivity(intent)
+                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                                 finish()
                             }
 //                                「タイトルに戻る」を押した時の処理
@@ -111,6 +123,7 @@ class NewPoint : AppCompatActivity() {
 
 //                                 今はないけど、データベースにも入力内容は送信したい
                                 startActivity(intent)
+                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                                 finish()
                             }
                             .show()
@@ -125,6 +138,7 @@ class NewPoint : AppCompatActivity() {
 //            "SearchMap.kt"への画面遷移
             val intent = Intent(this, SearchMap::class.java)
             startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
 //        現在地を参照するために必要なやつ（権限ではない、よくわからない）
@@ -195,6 +209,11 @@ class NewPoint : AppCompatActivity() {
         val focusView : TextView = findViewById(R.id.focusView)
         focusView.requestFocus()
         return super.dispatchTouchEvent(ev)
+    }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
 }
