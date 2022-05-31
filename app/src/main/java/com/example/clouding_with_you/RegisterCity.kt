@@ -1,7 +1,9 @@
 package com.example.clouding_with_you
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -38,6 +40,7 @@ class RegisterCity : AppCompatActivity() {
         val tvNothing: TextView = findViewById(R.id.tvNothing)
         val lvRegisterCity: ListView = findViewById(R.id.lvRegisterCity)
         val btnNewPointFronReg : Button = findViewById(R.id.btnNewPointFronReg)
+        val btnhelp_RegisterCity : Button = findViewById(R.id.btnhelp_RegisterCity)
 
 //        Listを表示するためのadapterの定義
         val adapter = ArrayAdapter<String>(
@@ -58,7 +61,7 @@ class RegisterCity : AppCompatActivity() {
         lvRegisterCity.setOnItemClickListener { _, _, i, _ ->
 
 //            押された項目の詳細と削除
-            AlertDialog.Builder(this)
+            val alertDialog5 = AlertDialog.Builder(this)
                 .setTitle("「$cityName」の詳細")
                 .setMessage("緯度：$cityLat 経度：$cityLng")
                 .setPositiveButton("戻る", null)
@@ -69,6 +72,16 @@ class RegisterCity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
                 }
                 .show()
+
+            // OKボタンのインスタンスを取得する
+            val positiveButton = alertDialog5.getButton(DialogInterface.BUTTON_POSITIVE)
+            // OKボタンの色を変更する
+            positiveButton.setTextColor(Color.BLACK)
+
+            // OKボタンのインスタンスを取得する
+            val negativeButton = alertDialog5.getButton(DialogInterface.BUTTON_NEGATIVE)
+            // OKボタンの色を変更する
+            negativeButton.setTextColor(Color.BLACK)
         }
 
 //        「新規地点登録画面へ移動」を押した時の処理
@@ -78,6 +91,14 @@ class RegisterCity : AppCompatActivity() {
             intent = Intent(this, NewPoint::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+
+        btnhelp_RegisterCity.setOnClickListener {
+//            btnhelp.visibility = View.INVISIBLE
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fl_RegisterCity,HelpFragment.newInstance())
+                .commit()
         }
     }
 
