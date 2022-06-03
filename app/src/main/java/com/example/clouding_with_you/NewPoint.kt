@@ -2,8 +2,10 @@ package com.example.clouding_with_you
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
@@ -53,6 +55,7 @@ class NewPoint : AppCompatActivity() {
         val btnMap : Button = findViewById(R.id.btnMap)
         val btnRegister : Button = findViewById(R.id.btnRegister)
         val btnCurrentLocation : Button = findViewById(R.id.btnCurrentLocation)
+        val btnhelp_NewPoint : Button = findViewById(R.id.btnhelp_NewPoint)
 
         if(decisionLng != null && decisionLat != null){
             etLat.setText(decisionLat)
@@ -66,36 +69,55 @@ class NewPoint : AppCompatActivity() {
             if (etCityName.text.toString() == "" || etLat.text.toString() == "" || etLng.text.toString() == ""){
 
 //                全てが入力されていない場合の表示
-                AlertDialog.Builder(this)
+                val alertDialog1 = AlertDialog.Builder(this)
                     .setTitle("ERROR!!")
                     .setMessage("全ての項目を入力")
                     .setPositiveButton("OK",null)
                     .show()
+
+
+                // OKボタンのインスタンスを取得する
+                val positiveButton = alertDialog1.getButton(DialogInterface.BUTTON_POSITIVE)
+                // OKボタンの色を変更する
+                positiveButton.setTextColor(Color.BLACK)
+
             }else{
 
 //                緯度の範囲を確認
                 if(etLat.text.toString().toDouble() <= -90.0 || 90.0 <= etLat.text.toString().toDouble()){
 
 //                    緯度が不適切な値の時の表示
-                    AlertDialog.Builder(this)
+                    val alertDialog2 = AlertDialog.Builder(this)
                         .setTitle("ERROR!!")
                         .setMessage("緯度は-90度から90度の範囲で入力してください")
                         .setPositiveButton("OK",null)
                         .show()
+
+                    // OKボタンのインスタンスを取得する
+                    val positiveButton = alertDialog2.getButton(DialogInterface.BUTTON_POSITIVE)
+                    // OKボタンの色を変更する
+                    positiveButton.setTextColor(Color.BLACK)
+
                 }else{
 //                    経度の範囲の確認
                     if(etLng.text.toString().toDouble() <= -180.0 || 180.0 <= etLng.text.toString().toDouble()){
 
 //                    経度が不適切な値の時の表示
-                        AlertDialog.Builder(this)
+                        val alertDialog3 = AlertDialog.Builder(this)
                             .setTitle("ERROR!!")
                             .setMessage("経度は-180度から180度の範囲で入力してください")
                             .setPositiveButton("OK",null)
                             .show()
+
+                        // OKボタンのインスタンスを取得する
+                        val positiveButton = alertDialog3.getButton(DialogInterface.BUTTON_POSITIVE)
+                        // OKボタンの色を変更する
+                        positiveButton.setTextColor(Color.BLACK)
+
                     }else{
 
 //                        全て正しい時の表示
-                        AlertDialog.Builder(this)
+                        val alertDialog4 = AlertDialog.Builder(this)
                             .setTitle("地点登録完了")
                             .setMessage("新規地点登録が完了しました")
 //                                「登録地点を見る」を押した時の処理
@@ -127,6 +149,16 @@ class NewPoint : AppCompatActivity() {
                                 finish()
                             }
                             .show()
+
+                        // OKボタンのインスタンスを取得する
+                        val positiveButton = alertDialog4.getButton(DialogInterface.BUTTON_POSITIVE)
+                        // OKボタンの色を変更する
+                        positiveButton.setTextColor(Color.BLACK)
+
+                        // OKボタンのインスタンスを取得する
+                        val negativeButton = alertDialog4.getButton(DialogInterface.BUTTON_NEGATIVE)
+                        // OKボタンの色を変更する
+                        negativeButton.setTextColor(Color.BLACK)
                     }
                 }
             }
@@ -169,6 +201,14 @@ class NewPoint : AppCompatActivity() {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
             }
+        }
+
+        btnhelp_NewPoint.setOnClickListener {
+//            btnhelp.visibility = View.INVISIBLE
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fl_NewPoint,HelpFragment.newInstance())
+                .commit()
         }
     }
 

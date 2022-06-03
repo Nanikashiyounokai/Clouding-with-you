@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.AdRequest
@@ -30,10 +31,10 @@ class MainActivity : AppCompatActivity() {
 
 
 //    変数宣言
-        val btnNewPoint : Button = findViewById(R.id.btnNewPoint)
-        val btnCity : Button = findViewById(R.id.btnCity)
-        val btnSetting : Button = findViewById(R.id.btnSetting)
-        val btnDetail : Button = findViewById(R.id.btnDetail)
+        val btnNewPoint : ImageButton = findViewById(R.id.btnNewPoint)
+        val btnCity : ImageButton = findViewById(R.id.btnCity)
+        val btnDetail : ImageButton = findViewById(R.id.btnDetail)
+        val btnhelp : Button = findViewById(R.id.btnhelp)
 
 //    「新規地点登録」を押した時
         btnNewPoint.setOnClickListener {
@@ -53,15 +54,6 @@ class MainActivity : AppCompatActivity() {
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
-//    「設定」を押した時
-        btnSetting.setOnClickListener {
-
-//          "SettingActivity.kt"に画面遷移
-            intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
-
 //    「詳細」を押した時
         btnDetail.setOnClickListener {
 
@@ -69,6 +61,14 @@ class MainActivity : AppCompatActivity() {
             intent = Intent(this, Detail::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+
+        btnhelp.setOnClickListener {
+//            btnhelp.visibility = View.INVISIBLE
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fl,HelpFragment.newInstance())
+                .commit()
         }
 
 //    アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）

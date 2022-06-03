@@ -106,6 +106,7 @@ class GetttingWeatherInformationService : Service() {
     }
 
 
+
 //    各ライフサイクル内で使う関数の定義
 
 //    APIキーを含むURLを入力して天気の情報を受け取る関数
