@@ -28,13 +28,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ListView
-        android:id="@+id/lvRegisterCity"
+<!--    <ListView-->
+<!--        android:id="@+id/lvRegisterCity"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        tools:layout_editor_absoluteX="127dp"-->
+<!--        tools:layout_editor_absoluteY="294dp">-->
+<!--    </ListView>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRegisterCity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="127dp"
         tools:layout_editor_absoluteY="294dp">
-    </ListView>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
