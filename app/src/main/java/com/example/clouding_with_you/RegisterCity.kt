@@ -107,18 +107,17 @@ class RegisterCity : AppCompatActivity() {
                     })
                 .show()
 
+                // OKボタンのインスタンスを取得する
+                val positiveButton = alertDialog5.getButton(DialogInterface.BUTTON_POSITIVE)
+                // OKボタンの色を変更する
+                positiveButton.setTextColor(Color.BLACK)
+
+                // OKボタンのインスタンスを取得する
+                val negativeButton = alertDialog5.getButton(DialogInterface.BUTTON_NEGATIVE)
+                // OKボタンの色を変更する
+                negativeButton.setTextColor(Color.BLACK)
+
             }
-
-
-            // OKボタンのインスタンスを取得する
-            val positiveButton = alertDialog5.getButton(DialogInterface.BUTTON_POSITIVE)
-            // OKボタンの色を変更する
-            positiveButton.setTextColor(Color.BLACK)
-
-            // OKボタンのインスタンスを取得する
-            val negativeButton = alertDialog5.getButton(DialogInterface.BUTTON_NEGATIVE)
-            // OKボタンの色を変更する
-            negativeButton.setTextColor(Color.BLACK)
 
         }
 
