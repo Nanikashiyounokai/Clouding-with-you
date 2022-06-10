@@ -12,6 +12,7 @@
         tools:ignore="ManifestOrder" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACTION_BOOT_COMPLETED"/>
 
     <application
         android:name=".MyCWYApplication"
@@ -26,6 +27,18 @@
             android:enabled="true"
             android:exported="false">
         </service>
+
+
+        <receiver
+            android:name=".StartupReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:process="">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".GetttingWeatherInformationReceiver"
@@ -65,10 +78,6 @@
         <activity
             android:name=".Detail"
             android:exported="false" />
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_settings" />
         <activity
             android:name=".RegisterCity"
             android:exported="false" />

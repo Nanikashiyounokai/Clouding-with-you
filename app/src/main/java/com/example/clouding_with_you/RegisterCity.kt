@@ -3,6 +3,7 @@ package com.example.clouding_with_you
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -50,7 +51,11 @@ class RegisterCity : AppCompatActivity() {
 
         //変数の定義
         val btnNewPointFronReg : Button = findViewById(R.id.btnNewPointFronReg)
+
         val rvRegisterCity : RecyclerView = findViewById(R.id.rvRegisterCity)
+
+        val btnhelp_RegisterCity : Button = findViewById(R.id.btnhelp_RegisterCity)
+
 
 //        intentされてきた変数の所得
         //val cityName = intent.getStringExtra("Register_CityName")
@@ -64,6 +69,16 @@ class RegisterCity : AppCompatActivity() {
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
+        
+        
+        btnhelp_RegisterCity.setOnClickListener {
+//            btnhelp.visibility = View.INVISIBLE
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fl_RegisterCity,HelpFragment.newInstance())
+                .commit()
+        }
+
 
         //RecyclerViewにアダプターとレイアウトマネージャーを設定する
         rvRegisterCity.layoutManager = LinearLayoutManager(this)
@@ -79,7 +94,7 @@ class RegisterCity : AppCompatActivity() {
             val lon = point?.lon
             val lat = point?.lat
             id?.let {
-                AlertDialog.Builder(this)
+                val alertDialog5 = AlertDialog.Builder(this)
                 .setTitle("「$point_name」の詳細")
                 .setMessage("緯度：$lon 経度：$lat")
                 .setPositiveButton("戻る", null)
@@ -91,10 +106,24 @@ class RegisterCity : AppCompatActivity() {
                         }
                     })
                 .show()
+
             }
+
+
+            // OKボタンのインスタンスを取得する
+            val positiveButton = alertDialog5.getButton(DialogInterface.BUTTON_POSITIVE)
+            // OKボタンの色を変更する
+            positiveButton.setTextColor(Color.BLACK)
+
+            // OKボタンのインスタンスを取得する
+            val negativeButton = alertDialog5.getButton(DialogInterface.BUTTON_NEGATIVE)
+            // OKボタンの色を変更する
+            negativeButton.setTextColor(Color.BLACK)
+
         }
 
     }
+
 
     //listが空かどうか判断
     private fun checkEmptyOfList() {
@@ -104,7 +133,8 @@ class RegisterCity : AppCompatActivity() {
         if(count > 0)
             tvNothing.visibility = View.GONE    // 空でない
         else
-            tvNothing.visibility = View.VISIBLE  // 空である
+            tvNothing.visibility = View.VISIBLE  // 空である           
+
     }
 
 

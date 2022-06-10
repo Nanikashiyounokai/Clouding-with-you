@@ -37,4 +37,17 @@
     <string name="tv4">天野陽菜は逃げ込んだ廃ビルの屋上でそう呟いた。その言葉を飲み込めなかった僕は、空が晴れたのをみて彼女の能力を知ったのだった。例えば、江戸時代、雨が降らなければ、作物は育たず、水を飲むことが難しい人もいただろう。恵みの雨という言葉があるように、雨は彼らの生活にとってなくてはならないものだ。現代でも同じように雨が全く降らなければ、それは一大事だが、あまり良い印象は与えられない。雨が降れば、傘を持ち出し、服は濡れ、交通機関が影響を受けることがある。現代の人間は晴れが好きな人が多いだろう。雨か晴れかで一喜一憂できるほどに、これら二つには一定の注目が集められていることがわかる。それでは曇りはどうだろう。一度くらい曇りにも焦点を当ててみてはいかがだろうか。そんな曇りが始まる前にこのような言葉を投げかけてみてはどうか。</string>
     <string name="tv5">「ねぇ、今から曇るよ」</string>
     <string name="btnNewPointFromReg">新規地点登録画面へ移動</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text6">使い方</string>
+    <string name="text7">このアプリは登録地点が</string>
+    <string name="text07">曇の時「だけ」通知します。</string>
+    <string name="text8">1,</string>
+    <string name="text08">新規地点登録ボタンから</string>
+    <string name="text008">曇の通知が欲しい地点を登録してください</string>
+    <string name="text9">2,</string>
+    <string name="text09">登録地点ボタンから登録地点の経緯の確認、</string>
+    <string name="text009">削除ができます</string>
+    <string name="text10">3,</string>
+    <string name="text010">通知は1時間に2回します。</string>
 </resources>
