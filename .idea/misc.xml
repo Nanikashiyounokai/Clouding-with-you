@@ -11,10 +11,11 @@
         <entry key="app/src/main/res/layout/activity_detail.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25622775800711745" />
         <entry key="app/src/main/res/layout/activity_new_point.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_register_city.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_register_city.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_search_map.xml" value="0.1398148148148148" />
         <entry key="app/src/main/res/layout/settings_activity.xml" value="0.1398148148148148" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1785" />
+        <entry key="app/src/main/res/xml/root_preferences.xml" value="0.1" />
       </map>
     </option>
   </component>

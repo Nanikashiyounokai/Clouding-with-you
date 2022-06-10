@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -13,15 +15,25 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.ads.AdRequest
+import com.example.clouding_with_you.databinding.ActivityNewPointBinding
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.snackbar.Snackbar
+import io.realm.Realm
+import io.realm.kotlin.where
+import io.realm.kotlin.createObject
 
 class NewPoint : AppCompatActivity() {
 
     lateinit var mAdView : AdView
+
+    //変数の取得は「binding」を用いる(浦部)
+    private var _binding: ActivityNewPointBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var realm: Realm
 
 //    位置情報を得るための変数
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -36,11 +48,13 @@ class NewPoint : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_point)
 
+        realm = Realm.getDefaultInstance()
+
         MobileAds.initialize(this) {}
 
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+        //mAdView = findViewById(R.id.adView)
+        //val adRequest = AdRequest.Builder().build()
+        //mAdView.loadAd(adRequest)
 
         //intentされてきた変数の所得
         val decisionLng = intent.getStringExtra("Decision_Lng")
@@ -93,6 +107,9 @@ class NewPoint : AppCompatActivity() {
                             .setPositiveButton("OK",null)
                             .show()
                     }else{
+                        //ここからDB登録
+                        // 「新規地点登録ボタン」が押されたら、「savePoint」メソッドを実行
+                        savePoint(it)
 
 //                        全て正しい時の表示
                         AlertDialog.Builder(this)
@@ -104,12 +121,12 @@ class NewPoint : AppCompatActivity() {
 //                                "RegisterCity.kt"への画面遷移
                                 val intent = Intent(this, RegisterCity::class.java)
 
-//                                今はないけど、入力データをデータベースにも飛ばしたい
+//
 
-//                                入力データを画面遷移先で参照するためのキーの定義
-                                intent.putExtra("Register_CityName", etCityName.text.toString())
-                                intent.putExtra("Register_Lat", etLat.text.toString())
-                                intent.putExtra("Register_Lng", etLng.text.toString())
+////                                入力データを画面遷移先で参照するためのキーの定義(追記：DBから、データを持ってくるので、この操作は不要)
+//                                intent.putExtra("Register_CityName", etCityName.text.toString())
+//                                intent.putExtra("Register_Lat", etLat.text.toString())
+//                                intent.putExtra("Register_Lng", etLng.text.toString())
 
                                 startActivity(intent)
                                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -204,11 +221,32 @@ class NewPoint : AppCompatActivity() {
         }
     }
 
-//    キーボードをしまうための関数（よくわからん、未完）
+    //新規地点をDBに登録するための関数
+    private fun savePoint(view: View) {
+        val etCityName : EditText = findViewById(R.id.etCityName)
+        val etLat : EditText = findViewById(R.id.etLat)
+        val etLng : EditText = findViewById(R.id.etLng)
+        realm.executeTransaction {
+            //                db: Realm ->
+            val maxId = realm.where<Point>().max("id")
+            val nextId = (maxId?.toLong() ?: 0L) + 1L
+            val point = realm.createObject<Point>(nextId)
+            point.point_name = etCityName.text.toString()
+            point.lon = etLng.text.toString().toDouble()
+            point.lat = etLat.text.toString().toDouble()
+        }
+    }
+
+    //    キーボードをしまうための関数（よくわからん、未完）
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         val focusView : TextView = findViewById(R.id.focusView)
         focusView.requestFocus()
         return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 
     override fun finish() {
