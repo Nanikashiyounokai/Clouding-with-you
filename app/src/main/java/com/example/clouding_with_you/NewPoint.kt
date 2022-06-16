@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -17,11 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.clouding_with_you.databinding.ActivityNewPointBinding
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import io.realm.kotlin.where
 import io.realm.kotlin.createObject
@@ -102,7 +98,7 @@ class NewPoint : AppCompatActivity() {
 //                    緯度が不適切な値の時の表示
                     val alertDialog2 = AlertDialog.Builder(this)
                         .setTitle("ERROR!!")
-                        .setMessage("緯度は-90度から90度の範囲で入力してください!")
+                        .setMessage("緯度は-90度から90度の範囲で入力してください!!")
                         .setPositiveButton("OK",null)
                         .show()
 
@@ -130,7 +126,7 @@ class NewPoint : AppCompatActivity() {
                     }else{
                         //ここからDB登録
                         // 「新規地点登録ボタン」が押されたら、「savePoint」メソッドを実行
-                        savePoint(it)
+                        savePoint()
 
 //                        全て正しい時の表示
                         val alertDialog4 = AlertDialog.Builder(this)
@@ -261,7 +257,7 @@ class NewPoint : AppCompatActivity() {
     }
 
     //新規地点をDBに登録するための関数
-    private fun savePoint(view: View) {
+    private fun savePoint() {
         val etCityName : EditText = findViewById(R.id.etCityName)
         val etLat : EditText = findViewById(R.id.etLat)
         val etLng : EditText = findViewById(R.id.etLng)
