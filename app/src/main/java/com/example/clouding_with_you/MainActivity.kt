@@ -17,7 +17,7 @@ import io.realm.RealmConfiguration
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var mAdView : AdView
+//    lateinit var mAdView : AdView
     private lateinit var mp:MediaPlayer
 
 //    Activityの生成
@@ -26,11 +26,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        MobileAds.initialize(this) {}
-
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+//        MobileAds.initialize(this) {}
+//
+//        mAdView = findViewById(R.id.adView)
+//        val adRequest = AdRequest.Builder().build()
+//        mAdView.loadAd(adRequest)
 
 
 //    変数宣言
