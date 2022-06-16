@@ -102,7 +102,7 @@ class NewPoint : AppCompatActivity() {
 //                    緯度が不適切な値の時の表示
                     val alertDialog2 = AlertDialog.Builder(this)
                         .setTitle("ERROR!!")
-                        .setMessage("緯度は-90度から90度の範囲で入力してください")
+                        .setMessage("緯度は-90度から90度の範囲で入力してください!")
                         .setPositiveButton("OK",null)
                         .show()
 
