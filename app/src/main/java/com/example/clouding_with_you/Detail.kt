@@ -8,18 +8,18 @@ import com.google.android.gms.ads.MobileAds
 
 class Detail : AppCompatActivity() {
 
-    lateinit var mAdView : AdView
+//    lateinit var mAdView : AdView
 
     //    Activityの生成
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        MobileAds.initialize(this) {}
-
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+//        MobileAds.initialize(this) {}
+//
+//        mAdView = findViewById(R.id.adView)
+//        val adRequest = AdRequest.Builder().build()
+//        mAdView.loadAd(adRequest)
     }
 
     override fun finish() {

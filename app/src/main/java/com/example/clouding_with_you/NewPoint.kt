@@ -28,7 +28,7 @@ import io.realm.kotlin.createObject
 
 class NewPoint : AppCompatActivity() {
 
-    lateinit var mAdView : AdView
+//    lateinit var mAdView : AdView
 
     //変数の取得は「binding」を用いる(浦部)
     private var _binding: ActivityNewPointBinding? = null
@@ -51,7 +51,7 @@ class NewPoint : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
 
-        MobileAds.initialize(this) {}
+//        MobileAds.initialize(this) {}
 
         //mAdView = findViewById(R.id.adView)
         //val adRequest = AdRequest.Builder().build()

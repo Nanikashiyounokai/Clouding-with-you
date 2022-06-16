@@ -32,7 +32,7 @@ class RegisterCity : AppCompatActivity() {
     private val binding get() = _binding!!
     private lateinit var realm: Realm //db関係
 
-    lateinit var mAdView : AdView
+//    lateinit var mAdView : AdView
 
     //    Activityの生成(新)
     @SuppressLint("SetTextI18n")
@@ -43,11 +43,11 @@ class RegisterCity : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance() //db関係　Realmデータベースを使用する準備
 
-        MobileAds.initialize(this) {}
-
-        mAdView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+//        MobileAds.initialize(this) {}
+//
+//        mAdView = findViewById(R.id.adView)
+//        val adRequest = AdRequest.Builder().build()
+//        mAdView.loadAd(adRequest)
 
         //変数の定義
         val btnNewPointFronReg : Button = findViewById(R.id.btnNewPointFronReg)
