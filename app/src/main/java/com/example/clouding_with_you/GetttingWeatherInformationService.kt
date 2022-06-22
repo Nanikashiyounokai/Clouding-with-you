@@ -7,6 +7,8 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
@@ -226,16 +228,18 @@ class GetttingWeatherInformationService : Service() {
 //    通知をするための準備
         var notificationId = 0
         val CHANNEL_ID = "channel_id"
-        val channel_name = "channel_name"
-        val channel_description = "channel_description "
 
 //    APIレベルに応じた通知チャンネルの作成（よくわかってない）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = channel_name
-            val descriptionText = channel_description
+            val audioAttributes = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                .build()
+            val uri = Uri.parse("android.resource://$packageName/${R.raw.notification_sound}")
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
+            val channel = NotificationChannel(CHANNEL_ID, "雲量通知", importance).apply {
+                description = "雲量の通知"
+                setSound(uri,audioAttributes)
             }
             /// チャネルを登録
             val notificationManager: NotificationManager =
