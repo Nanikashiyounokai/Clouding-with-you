@@ -60,10 +60,15 @@ class GetttingWeatherInformationService : Service() {
         //2．通知チャネル登録
         val channelId = CHANNEL_ID
         val channelName = "TestService Channel"
-        val channel = NotificationChannel(
-            channelId, channelName,
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+            .build()
+        val uri = Uri.parse("android.resource://$packageName/${R.raw.notification_sound_2}")
+        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = "雲の常時観測のお知らせ"
+            setSound(uri,audioAttributes)
+        }
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
 
@@ -231,15 +236,15 @@ class GetttingWeatherInformationService : Service() {
 
 //    APIレベルに応じた通知チャンネルの作成（よくわかってない）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val audioAttributes = AudioAttributes.Builder()
+            val audioAttributes2 = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
                 .build()
-            val uri = Uri.parse("android.resource://$packageName/${R.raw.notification_sound}")
+            val uri2 = Uri.parse("android.resource://$packageName/${R.raw.notification_sound}")
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, "雲量通知", importance).apply {
                 description = "雲量の通知"
-                setSound(uri,audioAttributes)
+                setSound(uri2,audioAttributes2)
             }
             /// チャネルを登録
             val notificationManager: NotificationManager =
