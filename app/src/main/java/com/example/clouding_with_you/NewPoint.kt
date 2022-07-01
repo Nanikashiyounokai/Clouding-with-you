@@ -127,50 +127,6 @@ class NewPoint : AppCompatActivity() {
                         //ここからDB登録
                         // 「新規地点登録ボタン」が押されたら、「savePoint」メソッドを実行
                         savePoint()
-
-//                        全て正しい時の表示
-                        val alertDialog4 = AlertDialog.Builder(this)
-                            .setTitle("地点登録完了")
-                            .setMessage("新規地点登録が完了しました")
-//                                「登録地点を見る」を押した時の処理
-                            .setPositiveButton("登録地点を見る") { _, _ ->
-
-//                                "RegisterCity.kt"への画面遷移
-                                val intent = Intent(this, RegisterCity::class.java)
-
-//
-
-////                                入力データを画面遷移先で参照するためのキーの定義(追記：DBから、データを持ってくるので、この操作は不要)
-//                                intent.putExtra("Register_CityName", etCityName.text.toString())
-//                                intent.putExtra("Register_Lat", etLat.text.toString())
-//                                intent.putExtra("Register_Lng", etLng.text.toString())
-
-                                startActivity(intent)
-                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                                finish()
-                            }
-//                                「タイトルに戻る」を押した時の処理
-                            .setNegativeButton("タイトルに戻る"){ _, _ ->
-
-//                                "MainActivity.kt"への画面遷移
-                                val intent = Intent(this, MainActivity::class.java)
-
-//                                 今はないけど、データベースにも入力内容は送信したい
-                                startActivity(intent)
-                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                                finish()
-                            }
-                            .show()
-
-                        // OKボタンのインスタンスを取得する
-                        val positiveButton = alertDialog4.getButton(DialogInterface.BUTTON_POSITIVE)
-                        // OKボタンの色を変更する
-                        positiveButton.setTextColor(Color.BLACK)
-
-                        // OKボタンのインスタンスを取得する
-                        val negativeButton = alertDialog4.getButton(DialogInterface.BUTTON_NEGATIVE)
-                        // OKボタンの色を変更する
-                        negativeButton.setTextColor(Color.BLACK)
                     }
                 }
             }
@@ -261,15 +217,92 @@ class NewPoint : AppCompatActivity() {
         val etCityName : EditText = findViewById(R.id.etCityName)
         val etLat : EditText = findViewById(R.id.etLat)
         val etLng : EditText = findViewById(R.id.etLng)
-        realm.executeTransaction {
-            //                db: Realm ->
-            val maxId = realm.where<Point>().max("id")
-            val nextId = (maxId?.toLong() ?: 0L) + 1L
-            val point = realm.createObject<Point>(nextId)
-            point.point_name = etCityName.text.toString()
-            point.lon = etLng.text.toString().toDouble()
-            point.lat = etLat.text.toString().toDouble()
+        val count:Int = realm.where<Point>().findAll().size
+        if(count == 10){
+            val alertDialog4 = AlertDialog.Builder(this)
+                .setTitle("登録できるのは最大で10地点です")
+                .setMessage("必要のない登録地点を削除してください")
+//                                「登録地点を見る」を押した時の処理
+                .setPositiveButton("登録地点を見る") { _, _ ->
+
+//                                "RegisterCity.kt"への画面遷移
+                    val intent = Intent(this, RegisterCity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                }
+//                                「タイトルに戻る」を押した時の処理
+                .setNegativeButton("タイトルに戻る"){ _, _ ->
+
+//                                "MainActivity.kt"への画面遷移
+                    val intent = Intent(this, MainActivity::class.java)
+
+//                                 今はないけど、データベースにも入力内容は送信したい
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                }
+                .show()
+
+            // OKボタンのインスタンスを取得する
+            val positiveButton = alertDialog4.getButton(DialogInterface.BUTTON_POSITIVE)
+            // OKボタンの色を変更する
+            positiveButton.setTextColor(Color.BLACK)
+
+            // OKボタンのインスタンスを取得する
+            val negativeButton = alertDialog4.getButton(DialogInterface.BUTTON_NEGATIVE)
+            // OKボタンの色を変更する
+            negativeButton.setTextColor(Color.BLACK)
+
+        }else{
+            realm.executeTransaction {
+                //                db: Realm ->
+                val maxId = realm.where<Point>().max("id")
+                val nextId = (maxId?.toLong() ?: 0L) + 1L
+                val point = realm.createObject<Point>(nextId)
+                point.point_name = etCityName.text.toString()
+                point.lon = etLng.text.toString().toDouble()
+                point.lat = etLat.text.toString().toDouble()
+                point.active = "False"
+            }
+
+            val alertDialog4 = AlertDialog.Builder(this)
+                .setTitle("地点登録完了")
+                .setMessage("新規地点登録が完了しました")
+//                                「登録地点を見る」を押した時の処理
+                .setPositiveButton("登録地点を見る") { _, _ ->
+
+//                                "RegisterCity.kt"への画面遷移
+                    val intent = Intent(this, RegisterCity::class.java)
+
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                }
+//                                「タイトルに戻る」を押した時の処理
+                .setNegativeButton("タイトルに戻る"){ _, _ ->
+
+//                                "MainActivity.kt"への画面遷移
+                    val intent = Intent(this, MainActivity::class.java)
+
+//                                 今はないけど、データベースにも入力内容は送信したい
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                }
+                .show()
+
+            // OKボタンのインスタンスを取得する
+            val positiveButton = alertDialog4.getButton(DialogInterface.BUTTON_POSITIVE)
+            // OKボタンの色を変更する
+            positiveButton.setTextColor(Color.BLACK)
+
+            // OKボタンのインスタンスを取得する
+            val negativeButton = alertDialog4.getButton(DialogInterface.BUTTON_NEGATIVE)
+            // OKボタンの色を変更する
+            negativeButton.setTextColor(Color.BLACK)
         }
+
     }
 
     //    キーボードをしまうための関数（よくわからん、未完）

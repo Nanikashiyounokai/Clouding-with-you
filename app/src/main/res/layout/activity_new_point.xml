@@ -29,7 +29,6 @@
         android:autofillHints=""
         android:ems="10"
         android:hint="@string/etCityName"
-        android:textColor="#ffffffff"
         android:inputType="textPersonName"
         android:textColorHint="#EAEAEA"
         android:textSize="24sp"
