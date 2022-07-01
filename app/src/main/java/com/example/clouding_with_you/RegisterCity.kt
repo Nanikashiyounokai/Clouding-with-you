@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.size
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clouding_with_you.databinding.ActivityRegisterCityBinding
@@ -57,6 +58,7 @@ class RegisterCity : AppCompatActivity() {
         val btnhelp_RegisterCity : Button = findViewById(R.id.btnhelp_RegisterCity)
 
 
+
 //        intentされてきた変数の所得
         //val cityName = intent.getStringExtra("Register_CityName")
         //val cityLng = intent.getStringExtra("Register_Lng")
@@ -85,6 +87,9 @@ class RegisterCity : AppCompatActivity() {
         val points = realm.where<Point>().findAll()
         val adapter = PointAdapter(points)
         rvRegisterCity.adapter = adapter
+
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
+        rvRegisterCity.addItemDecoration(dividerItemDecoration)
 
         checkEmptyOfList()
 

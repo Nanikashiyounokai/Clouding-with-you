@@ -100,7 +100,7 @@ class GetttingWeatherInformationService : Service() {
 //    繰り返し通知するための時間設定（現在はServiceが開始してから30分ごと）
         val notificationInterval: TimerTask.() -> Unit = {
             realm = Realm.getDefaultInstance()
-            val points = realm.where<Point>().findAll()
+            val points = realm.where<Point>().equalTo("active", "True").findAll()
             //DBのpointそれぞれでAPIを叩く
             for(point in points) {
                 //APIキーを含むURLを入力して天気の情報を受け取る関数
