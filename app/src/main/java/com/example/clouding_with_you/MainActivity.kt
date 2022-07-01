@@ -86,16 +86,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        mp.start()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mp.pause()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         mp.stop()
