@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -64,7 +65,7 @@ class NewPoint : AppCompatActivity() {
         val btnMap : Button = findViewById(R.id.btnMap)
         val btnRegister : Button = findViewById(R.id.btnRegister)
         val btnCurrentLocation : Button = findViewById(R.id.btnCurrentLocation)
-        val btnhelp_NewPoint : Button = findViewById(R.id.btnhelp_NewPoint)
+        val btnhome : ImageButton = findViewById(R.id.homeButtonNewCity)
 
         if(decisionLng != null && decisionLat != null){
             etLat.setText(decisionLat)
@@ -171,12 +172,11 @@ class NewPoint : AppCompatActivity() {
             }
         }
 
-        btnhelp_NewPoint.setOnClickListener {
-//            btnhelp.visibility = View.INVISIBLE
-
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_NewPoint,HelpFragment.newInstance())
-                .commit()
+        btnhome.setOnClickListener {
+            intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 
