@@ -81,10 +81,14 @@ class GetttingWeatherInformationService : Service() {
         }
         val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, 0)
 
+        realm = Realm.getDefaultInstance()
+        val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
+        val city_name: String = point?.point_name.toString()
+
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle("曇を観測中")
+            .setContentTitle("${city_name}で祈願中")
             .setContentText("現在の状況の確認はこの通知をタップ")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
@@ -100,17 +104,24 @@ class GetttingWeatherInformationService : Service() {
 //    繰り返し通知するための時間設定（現在はServiceが開始してから30分ごと）
         val notificationInterval: TimerTask.() -> Unit = {
             realm = Realm.getDefaultInstance()
-            val points = realm.where<Point>().equalTo("active", "True").findAll()
-            //DBのpointそれぞれでAPIを叩く
-            for(point in points) {
-                //APIキーを含むURLを入力して天気の情報を受け取る関数
-                val id: Long = point.id
-                gettingWeatherInformation(id)
-            }
+
+            val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
+            val id:Long = point?.id!!.toLong()
+            gettingWeatherInformation(id)
+
+//            val points = realm.where<Point>().equalTo("active", "True").findAll()
+//            //DBのpointそれぞれでAPIを叩く
+//            for(point in points) {
+//                //APIキーを含むURLを入力して天気の情報を受け取る関数
+//                val id: Long = point.id
+//                gettingWeatherInformation(id)
+//            }
 //            APIキーを含むURLを入力して天気の情報を受け取る関数
             //gettingWeatherInformation()
         }
-        Timer().schedule(0, 1800000, notificationInterval)
+
+        //Timer().schedule(0, 1800000, notificationInterval)
+        Timer().schedule(0, 600000, notificationInterval)
 
 //    システムがサービスを強制終了した場合に、サービスをどのように続行するかを示す
 //    これは「強制終了した場合、サービスを再作成しonStartCommand() を呼び出すが、最後のインテントは再配信しない。
@@ -123,8 +134,6 @@ class GetttingWeatherInformationService : Service() {
     override fun stopService(name: Intent?): Boolean {
         return super.stopService(name)
     }
-
-
 
 //    各ライフサイクル内で使う関数の定義
 
@@ -211,24 +220,8 @@ class GetttingWeatherInformationService : Service() {
         val nowTime = weatherNowJSONObject.getInt("dt")
         val futureTime = weatherFutureJSONObject.getInt("dt")
         val minute: Int = (futureTime - nowTime) / 60
-//    val minute: Int = (50 - 10) / 60
-
-//    JSONデータから"cityName"と"weather"の取り出し
-//        val weatherJSONArray = jsonObj.getJSONArray("weather")
-//        val weatherJson = weatherJSONArray.getJSONObject(0)
-//        val weather = weatherJson.getString("description")
-//        val cityName = jsonObj.getString("name")
-
-//        //曇り率計算（全て少数型で計算）
-//        val cloudingRate:Double = (futureClouds.toDouble()-nowClouds.toDouble())/minute.toDouble()
-//        //曇り率に応じてメッセージを分岐(1.0は仮代入)
-//        if (cloudingRate >= 1.0){
-//           val message = "ねぇ、今から曇るよ"
-//        }else if (nowClouds <= 75){
-//           val message = "ねぇ、この空が曇ってほしいと思う？"
-//        }else if (nowClouds > 75){
-//           val message = "青空よりも俺は曇天がいい！天気なんて曇ったままでいいんだ！"
-//        }
+        //曇り率計算（全て少数型で計算）
+        val cloudingRate:Double = (futureClouds.toDouble()-nowClouds.toDouble())/minute.toDouble()
 
 //    通知をするための準備
         var notificationId = 0
@@ -267,7 +260,8 @@ class GetttingWeatherInformationService : Service() {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.notification_icon)  /// 表示されるアイコン
             .setContentTitle("${city_name}の上空")                     /// 通知タイトル（仮に東京を代入）
-            .setContentText("現在の雲量は${nowClouds},${minute}分後の雲量は${futureClouds},")  /// 通知コンテンツ
+            .setContentText("ねぇ、今から曇るよ")  /// 通知コンテンツ
+            //.setContentText("テスト,${cloudingRate},${nowClouds},${futureClouds}")  /// 通知コンテンツ
             //.setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_MAX)    /// 通知の優先度
             .setContentIntent(openIntent)                    /// 天気の通知をタップした時に画面遷移
@@ -275,68 +269,16 @@ class GetttingWeatherInformationService : Service() {
         /// この通知にボタンを追加する
 //            .setAutoCancel(true)                           /// 何らかで画面遷移した時にこの通知を消す
 
+        if(cloudingRate >= 1.0) {
 //    通知のビルド
-        with(NotificationManagerCompat.from(this)) {
-            notify(notificationId, builder.build())
-            notificationId += 1
+            with(NotificationManagerCompat.from(this)) {
+                notify(notificationId, builder.build())
+                notificationId += 1
+            }
         }
 
-
-//    以下曇の時に通知が出るように条件分岐した場合のコード
-
-//        var notificationId = 0   /// notificationID
-//        if(weather == "薄い雲"||
-//            weather == "雲"||
-//            weather == "曇りがち"||
-//            weather == "厚い雲") {
-//
-//            //        以下通知に関する記述
-//            val CHANNEL_ID = "channel_id"
-//            val channel_name = "channel_name"
-//            val channel_description = "channel_description "
-//
-//            ///APIレベルに応じてチャネルを作成
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                val name = channel_name
-//                val descriptionText = channel_description
-//                val importance = NotificationManager.IMPORTANCE_DEFAULT
-//                val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-//                    description = descriptionText
-//                }
-//                /// チャネルを登録
-//                val notificationManager: NotificationManager =
-//                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//                notificationManager.createNotificationChannel(channel)
-//            }
-
-        //        val openIntent = Intent(this, MainActivity::class.java).let {
-        //            PendingIntent.getActivity(this, 0, it, 0)
-        //        }
-
-        //        val activityIntent = Intent(this, RegisterCity::class.java).apply {
-        //            action = Intent.ACTION_SEND
-        //        }
-        //        val RegisterCityIntent = PendingIntent.getBroadcast(this, 0, activityIntent, 0)
-
-//
-//            /// 通知の中身
-//            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.drawable.ic_launcher_background)    /// 表示されるアイコン
-//                .setContentTitle("東京の上空")                  /// 通知タイトル
-//                .setContentText("今から曇るよ")           /// 通知コンテンツ
-//                .setPriority(NotificationCompat.PRIORITY_MAX)   /// 通知の優先度
-//                .setContentIntent(openIntent)
-//                .addAction(R.drawable.ic_launcher_foreground, "詳細確認", RegisterCityIntent)
-//                 .setAutoCancel(true)
-//
-//            /// ボタンを押して通知を表示
-//            with(NotificationManagerCompat.from(this)) {
-//                notify(notificationId, builder.build())
-//                notificationId += 1
-//            }
-//        }
-
     }
+
     override fun onDestroy() {
         super.onDestroy()
         realm.close()
