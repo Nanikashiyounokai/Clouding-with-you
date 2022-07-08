@@ -67,8 +67,7 @@
         android:background="#00000000"
         android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9
-"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnNewPoint"
         app:srcCompat="@drawable/real_cloud_long_reg" />
@@ -87,29 +86,18 @@
         app:layout_constraintTop_toBottomOf="@+id/btnCity"
         app:srcCompat="@drawable/real_cloud_long_detail" />
 
-    <FrameLayout
-        android:id="@+id/fl"
-        android:layout_width="350dp"
-        android:layout_height="650dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.26">
+<!--    <FrameLayout-->
+<!--        android:id="@+id/fl"-->
+<!--        android:layout_width="350dp"-->
+<!--        android:layout_height="650dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.26">-->
 
-    </FrameLayout>
+<!--    </FrameLayout>-->
 
-    <Button
-        android:id="@+id/btnhelp"
-        android:layout_width="59dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="90dp"
-        android:drawableBottom="@android:drawable/ic_menu_help"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="-2dp"
-        tools:ignore="UnusedAttribute"/>
 
 
     <!--    実際の広告IDは以下"ca-app-pub-2529783942153390/2722707931"-->
