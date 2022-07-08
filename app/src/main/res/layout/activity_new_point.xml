@@ -29,6 +29,7 @@
         android:autofillHints=""
         android:ems="10"
         android:hint="@string/etCityName"
+        android:textColor="#ffffffff"
         android:inputType="textPersonName"
         android:textColorHint="#EAEAEA"
         android:textSize="24sp"
@@ -70,9 +71,11 @@
 
     <Button
         android:id="@+id/btnMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="48dp"
         android:layout_marginTop="70dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         android:text="@string/btnMap"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -81,9 +84,11 @@
 
     <Button
         android:id="@+id/btnRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"
+        android:layout_width="150dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         android:text="@string/btnRegister"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -91,9 +96,11 @@
 
     <Button
         android:id="@+id/btnCurrentLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="48dp"
         android:layout_marginTop="70dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         android:text="@string/btnCurrentLocation"
         app:layout_constraintEnd_toStartOf="@+id/btnMap"
         app:layout_constraintHorizontal_bias="0.5"
@@ -111,7 +118,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-<!--    <com.google.android.gms.ads.AdView-->
+    <ImageButton
+        android:id="@+id/homeButtonNewCity"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="20dp"
+        android:adjustViewBounds="false"
+        android:background="#00000000"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/home_btn" />
+
+    <!--    <com.google.android.gms.ads.AdView-->
 <!--        android:id="@+id/adView"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
@@ -124,32 +144,22 @@
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        tools:ignore="MissingConstraints" />-->
 
-    <FrameLayout
-        android:id="@+id/fl_NewPoint"
-        android:layout_width="350dp"
-        android:layout_height="650dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.26"
-        android:elevation="2dp"
-        tools:ignore="UnusedAttribute">
+<!--    <FrameLayout-->
+<!--        android:id="@+id/fl_NewPoint"-->
+<!--        android:layout_width="350dp"-->
+<!--        android:layout_height="650dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.26"-->
+<!--        android:elevation="2dp"-->
+<!--        tools:ignore="UnusedAttribute">-->
 
-    </FrameLayout>
+<!--    </FrameLayout>-->
 
 
-    <Button
-        android:id="@+id/btnhelp_NewPoint"
-        android:layout_width="59dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="90dp"
-        android:drawableBottom="@android:drawable/ic_menu_help"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="-2dp"
-        tools:ignore="UnusedAttribute"/>
+
 
 
     <!--    実際の広告IDは以下"ca-app-pub-2529783942153390/2722707931"-->

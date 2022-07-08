@@ -9,10 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.size
@@ -55,7 +52,7 @@ class RegisterCity : AppCompatActivity() {
 
         val rvRegisterCity : RecyclerView = findViewById(R.id.rvRegisterCity)
 
-        val btnhelp_RegisterCity : Button = findViewById(R.id.btnhelp_RegisterCity)
+        val btnhome : ImageButton = findViewById(R.id.homeButtonReg)
 
 
 
@@ -73,12 +70,11 @@ class RegisterCity : AppCompatActivity() {
         }
         
         
-        btnhelp_RegisterCity.setOnClickListener {
-//            btnhelp.visibility = View.INVISIBLE
-
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_RegisterCity,HelpFragment.newInstance())
-                .commit()
+        btnhome.setOnClickListener {
+            intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
 
@@ -140,9 +136,6 @@ class RegisterCity : AppCompatActivity() {
             tvNothing.visibility = View.VISIBLE  // 空である           
 
     }
-
-
-
 
     //    Activityの生成(旧)
 //    @SuppressLint("SetTextI18n")
