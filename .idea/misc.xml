@@ -13,15 +13,15 @@
         <entry key="app/src/main/res/drawable/shape_rounded_corner.xml" value="0.3335" />
         <entry key="app/src/main/res/layout-v21/activity_new_point.xml" value="0.33125" />
         <entry key="app/src/main/res/layout-v21/fragment_help.xml" value="0.33125" />
-        <entry key="app/src/main/res/layout/activity_detail.xml" value="0.20236968994140625" />
+        <entry key="app/src/main/res/layout/activity_detail.xml" value="0.4409133911132812" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_new_point.xml" value="0.39908599853515625" />
         <entry key="app/src/main/res/layout/activity_register_city.xml" value="0.24444444444444444" />
         <entry key="app/src/main/res/layout/activity_rv_detail.xml" value="0.23432769775390622" />
         <entry key="app/src/main/res/layout/activity_search_map.xml" value="0.1398148148148148" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.33125" />
-        <entry key="app/src/main/res/layout/fragment_help.xml" value="0.25802764892578123" />
-        <entry key="app/src/main/res/layout/rv_detail.xml" value="0.311083984375" />
+        <entry key="app/src/main/res/layout/fragment_help.xml" value="0.4695648193359375" />
+        <entry key="app/src/main/res/layout/rv_detail.xml" value="0.1" />
         <entry key="app/src/main/res/layout/settings_activity.xml" value="0.1398148148148148" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1785" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.1" />
