@@ -40,14 +40,15 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="text6">使い方</string>
-    <string name="text7">このアプリは登録地点が</string>
+    <string name="text7">このアプリは観測地点が</string>
     <string name="text07">曇りそうなとき ”だけ” 通知します。</string>
     <string name="text8">1,</string>
     <string name="text08">新規地点登録画面から</string>
     <string name="text008">必要項目を入力し地点登録をしてください</string>
     <string name="text9">2,</string>
     <string name="text09">登録地点一覧画面から</string>
-    <string name="text009">観測を行う地点の変更、登録地点の削除ができます</string>
+    <string name="text009_1">曇り状況を観測する地点の選択、</string>
+    <string name="text009_2">登録地点の削除ができます</string>
     <string name="text10">3,</string>
     <string name="text010">観測地点が曇りそうな時、通知します</string>
 </resources>
