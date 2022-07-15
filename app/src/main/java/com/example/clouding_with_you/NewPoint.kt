@@ -57,6 +57,7 @@ class NewPoint : AppCompatActivity() {
         //intentされてきた変数の所得
         val decisionLng = intent.getStringExtra("Decision_Lng")
         val decisionLat = intent.getStringExtra("Decision_Lat")
+        val reCityName = intent.getStringExtra("RECITYNAME_KEY")
 
 //        変数の定義
         val etCityName : EditText = findViewById(R.id.etCityName)
@@ -70,6 +71,9 @@ class NewPoint : AppCompatActivity() {
         if(decisionLng != null && decisionLat != null){
             etLat.setText(decisionLat)
             etLng.setText(decisionLng)
+        }
+        if(reCityName != null ){
+            etCityName.setText(reCityName)
         }
 
 //        新規登録ボタンを押した時の処理
@@ -99,7 +103,7 @@ class NewPoint : AppCompatActivity() {
 //                    緯度が不適切な値の時の表示
                     val alertDialog2 = AlertDialog.Builder(this)
                         .setTitle("ERROR!!")
-                        .setMessage("緯度は-90度から90度の範囲で入力してください!")
+                        .setMessage("緯度は-90度から90度の範囲で入力してください")
                         .setPositiveButton("OK",null)
                         .show()
 
@@ -138,7 +142,14 @@ class NewPoint : AppCompatActivity() {
 
 //            "SearchMap.kt"への画面遷移
             val intent = Intent(this, SearchMap::class.java)
+
+            //textは受け渡す変数
+            val text = etCityName.text.toString()
+            //intent変数をつなげる(第一引数はキー，第二引数は渡したい変数)
+
+            intent.putExtra("CITYNAME_KEY",text)
             startActivity(intent)
+
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
@@ -263,12 +274,17 @@ class NewPoint : AppCompatActivity() {
                 point.point_name = etCityName.text.toString()
                 point.lon = etLng.text.toString().toDouble()
                 point.lat = etLat.text.toString().toDouble()
-                point.active = "False"
+                if(count == 0){
+                    point.active = "True"
+                }else{
+                    point.active = "False"
+                }
             }
 
             val alertDialog4 = AlertDialog.Builder(this)
                 .setTitle("地点登録完了")
                 .setMessage("新規地点登録が完了しました")
+                .setMessage("「登録地点」から祈願中を選択すると曇り状況を通知してくれます")
 //                                「登録地点を見る」を押した時の処理
                 .setPositiveButton("登録地点を見る") { _, _ ->
 

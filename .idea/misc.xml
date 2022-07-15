@@ -20,6 +20,7 @@
         <entry key="app/src/main/res/layout/activity_search_map.xml" value="0.1398148148148148" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.33125" />
         <entry key="app/src/main/res/layout/fragment_help.xml" value="0.25802764892578123" />
+        <entry key="app/src/main/res/layout/rv_detail.xml" value="0.16109422492401215" />
         <entry key="app/src/main/res/layout/settings_activity.xml" value="0.1398148148148148" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1785" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.1" />

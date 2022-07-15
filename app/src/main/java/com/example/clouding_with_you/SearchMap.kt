@@ -72,6 +72,8 @@ class SearchMap : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
+        val text = intent.getStringExtra("CITYNAME_KEY")
+
         btnDecision.setOnClickListener {
             val decisionLat = (Math.round(lat * 10000)).toDouble()/10000
             val decisionLng = (Math.round(lng * 10000)).toDouble()/10000
@@ -81,6 +83,7 @@ class SearchMap : AppCompatActivity(), OnMapReadyCallback {
             //NewPointに緯度経度を渡す。
             intent.putExtra("Decision_Lat", decisionLat.toString())
             intent.putExtra("Decision_Lng", decisionLng.toString())
+            intent.putExtra("RECITYNAME_KEY", text)
             startActivity(intent)
             finish()
         }
