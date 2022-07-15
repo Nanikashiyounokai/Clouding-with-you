@@ -40,11 +40,11 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-ads:21.0.0'
+    implementation 'com.google.android.gms:play-services-ads:21.1.0'
 
     //implementation 'io.realm:android-adapters:2.1.1'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.0"
 
     implementation 'com.google.android.gms:play-services-location:20.0.0'
     implementation 'androidx.core:core-ktx:1.8.0'

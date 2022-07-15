@@ -57,6 +57,7 @@ class NewPoint : AppCompatActivity() {
         //intentされてきた変数の所得
         val decisionLng = intent.getStringExtra("Decision_Lng")
         val decisionLat = intent.getStringExtra("Decision_Lat")
+        val reCityName = intent.getStringExtra("RECITYNAME_KEY")
 
 //        変数の定義
         val etCityName : EditText = findViewById(R.id.etCityName)
@@ -70,6 +71,9 @@ class NewPoint : AppCompatActivity() {
         if(decisionLng != null && decisionLat != null){
             etLat.setText(decisionLat)
             etLng.setText(decisionLng)
+        }
+        if(reCityName != null ){
+            etCityName.setText(reCityName)
         }
 
 //        新規登録ボタンを押した時の処理
@@ -138,7 +142,14 @@ class NewPoint : AppCompatActivity() {
 
 //            "SearchMap.kt"への画面遷移
             val intent = Intent(this, SearchMap::class.java)
+
+            //textは受け渡す変数
+            val text = etCityName.text.toString()
+            //intent変数をつなげる(第一引数はキー，第二引数は渡したい変数)
+
+            intent.putExtra("CITYNAME_KEY",text)
             startActivity(intent)
+
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
