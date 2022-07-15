@@ -274,12 +274,17 @@ class NewPoint : AppCompatActivity() {
                 point.point_name = etCityName.text.toString()
                 point.lon = etLng.text.toString().toDouble()
                 point.lat = etLat.text.toString().toDouble()
-                point.active = "False"
+                if(count == 0){
+                    point.active = "True"
+                }else{
+                    point.active = "False"
+                }
             }
 
             val alertDialog4 = AlertDialog.Builder(this)
                 .setTitle("地点登録完了")
                 .setMessage("新規地点登録が完了しました")
+                .setMessage("「登録地点」から祈願中を選択すると曇り状況を通知してくれます")
 //                                「登録地点を見る」を押した時の処理
                 .setPositiveButton("登録地点を見る") { _, _ ->
 

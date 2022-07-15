@@ -63,7 +63,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/frame_style"
-        android:text="懇願中"
+        android:text="祈願中"
         android:textSize="10sp"
         android:textColor="#FFFFFF"
         android:paddingBottom="6dp"
