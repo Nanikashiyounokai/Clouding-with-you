@@ -82,6 +82,7 @@ class GetttingWeatherInformationService : Service() {
         val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, 0)
 
         realm = Realm.getDefaultInstance()
+
         val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
 
         var message: String
@@ -111,7 +112,6 @@ class GetttingWeatherInformationService : Service() {
 //    繰り返し通知するための時間設定（現在はServiceが開始してから30分ごと）
         val notificationInterval: TimerTask.() -> Unit = {
             realm = Realm.getDefaultInstance()
-
             val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
             if (point != null){
                 val id:Long = point?.id!!.toLong()
