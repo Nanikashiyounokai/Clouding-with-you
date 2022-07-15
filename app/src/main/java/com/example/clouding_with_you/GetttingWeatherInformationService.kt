@@ -83,16 +83,23 @@ class GetttingWeatherInformationService : Service() {
 
         realm = Realm.getDefaultInstance()
         val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
-        val city_name: String = point?.point_name.toString()
+
+        var message: String
+        if(point != null){
+            val city_name: String = point?.point_name.toString()
+            message = "${city_name}で祈願中"
+        }else{
+            message = "地点登録をしてください。"
+        }
 
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle("${city_name}で祈願中")
+            .setContentTitle(message)
             .setContentText("現在の状況の確認はこの通知をタップ")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
-            .addAction(R.drawable.notification_icon, "観測の終了はこちら", sendPendingIntent)
+            .addAction(R.drawable.notification_icon, "アプリ起動", sendPendingIntent)
             .build()
 
         //5．フォアグラウンド開始。
@@ -106,18 +113,10 @@ class GetttingWeatherInformationService : Service() {
             realm = Realm.getDefaultInstance()
 
             val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
-            val id:Long = point?.id!!.toLong()
-            gettingWeatherInformation(id)
-
-//            val points = realm.where<Point>().equalTo("active", "True").findAll()
-//            //DBのpointそれぞれでAPIを叩く
-//            for(point in points) {
-//                //APIキーを含むURLを入力して天気の情報を受け取る関数
-//                val id: Long = point.id
-//                gettingWeatherInformation(id)
-//            }
-//            APIキーを含むURLを入力して天気の情報を受け取る関数
-            //gettingWeatherInformation()
+            if (point != null){
+                val id:Long = point?.id!!.toLong()
+                gettingWeatherInformation(id)
+            }
         }
 
         //Timer().schedule(0, 1800000, notificationInterval)
