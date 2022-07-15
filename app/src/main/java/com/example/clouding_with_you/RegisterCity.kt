@@ -77,7 +77,6 @@ class RegisterCity : AppCompatActivity() {
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
-
         //RecyclerViewにアダプターとレイアウトマネージャーを設定する
         rvRegisterCity.layoutManager = LinearLayoutManager(this)
         val points = realm.where<Point>().findAll()
@@ -123,7 +122,6 @@ class RegisterCity : AppCompatActivity() {
         }
 
     }
-
 
     //listが空かどうか判断
     private fun checkEmptyOfList() {
