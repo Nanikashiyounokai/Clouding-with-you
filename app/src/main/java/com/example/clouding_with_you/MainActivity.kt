@@ -37,10 +37,9 @@ class MainActivity : AppCompatActivity() {
         val btnNewPoint : ImageButton = findViewById(R.id.btnNewPoint)
         val btnCity : ImageButton = findViewById(R.id.btnCity)
         val btnDetail : ImageButton = findViewById(R.id.btnDetail)
-        val btnhelp : Button = findViewById(R.id.btnhelp)
 
     //    グランドエスケープっぽい曲を流す
-        mp = MediaPlayer.create(this,R.raw.grand_escapo)
+        mp = MediaPlayer.create(this,R.raw.grand_escapo2)
         mp.isLooping = true
         mp.start()
 
@@ -69,14 +68,6 @@ class MainActivity : AppCompatActivity() {
             intent = Intent(this, Detail::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
-
-        btnhelp.setOnClickListener {
-//            btnhelp.visibility = View.INVISIBLE
-
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fl,HelpFragment.newInstance())
-                .commit()
         }
 
 //    アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
