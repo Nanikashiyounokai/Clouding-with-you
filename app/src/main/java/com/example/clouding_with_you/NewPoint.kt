@@ -195,6 +195,14 @@ class NewPoint : AppCompatActivity() {
     private fun fetchLocation() {
         val task = fusedLocationProviderClient.lastLocation
 
+//    「現在地から参照」 を押した時に出る不具合が改善できそうなコード
+//        if (task == null){
+//            fusedLocationProviderClient.requestLocationUpdates(
+//                locationRequest,
+//                locationCallback,
+//                Looper.getMainLooper())
+//        }
+
 //        スマホへの位置情報へアクセスするための権限の確認
         if(ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED && ActivityCompat
@@ -204,6 +212,8 @@ class NewPoint : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),101)
             return
         }
+
+
 
 //        緯度と経度の呼び出し及び入力
         task.addOnSuccessListener {

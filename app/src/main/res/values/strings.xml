@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">曇天気の子</string>
-    <string name="tvTitle">曇天気の子</string>
+    <string name="app_name">曇天気の娘</string>
+    <string name="tvTitle">曇天気の娘</string>
     <string name="tvSubTitle">今から曇るよ</string>
     <string name="btnNewPoint">新規地点登録</string>
     <string name="btnCity">登録地点</string>
@@ -32,7 +32,7 @@
     <string name="title_activity_search_map">SearchMap</string>
     <string name="tvNothing">登録地点がありません</string>
     <string name="tv1">このアプリについて</string>
-    <string name="tv2">曇天気の子</string>
+    <string name="tv2">曇天気の娘</string>
     <string name="tv3">「ねぇ、今から曇るよ」</string>
     <string name="tv4">天野陽菜は逃げ込んだ廃ビルの屋上でそう呟いた。その言葉を飲み込めなかった僕は、空が晴れたのをみて彼女の能力を知ったのだった。例えば、江戸時代、雨が降らなければ、作物は育たず、水を飲むことが難しい人もいただろう。恵みの雨という言葉があるように、雨は彼らの生活にとってなくてはならないものだ。現代でも同じように雨が全く降らなければ、それは一大事だが、あまり良い印象は与えられない。雨が降れば、傘を持ち出し、服は濡れ、交通機関が影響を受けることがある。現代の人間は晴れが好きな人が多いだろう。雨か晴れかで一喜一憂できるほどに、これら二つには一定の注目が集められていることがわかる。それでは曇りはどうだろう。一度くらい曇りにも焦点を当ててみてはいかがだろうか。そんな曇りが始まる前にこのような言葉を投げかけてみてはどうか。</string>
     <string name="tv5">「ねぇ、今から曇るよ」</string>
