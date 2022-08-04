@@ -46,12 +46,6 @@ class NewPoint : AppCompatActivity() {
 
         realm = Realm.getDefaultInstance()
 
-//        MobileAds.initialize(this) {}
-
-        //mAdView = findViewById(R.id.adView)
-        //val adRequest = AdRequest.Builder().build()
-        //mAdView.loadAd(adRequest)
-
         //intentされてきた変数の所得
         val decisionLng = intent.getStringExtra("Decision_Lng")
         val decisionLat = intent.getStringExtra("Decision_Lat")
