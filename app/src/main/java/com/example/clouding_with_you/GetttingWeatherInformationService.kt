@@ -268,7 +268,7 @@ class GetttingWeatherInformationService : Service() {
         /// この通知にボタンを追加する
 //            .setAutoCancel(true)                           /// 何らかで画面遷移した時にこの通知を消す
 
-        if(cloudingRate >= 0.75) {
+        if(cloudingRate >= 0.5) {
 //    通知のビルド
             with(NotificationManagerCompat.from(this)) {
                 notify(notificationId, builder.build())
