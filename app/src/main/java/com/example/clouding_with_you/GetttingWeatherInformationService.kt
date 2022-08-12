@@ -25,7 +25,6 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.util.*
 import kotlin.concurrent.schedule
-import kotlin.math.roundToInt
 
 //アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
 class GetttingWeatherInformationService : Service() {
@@ -97,7 +96,7 @@ class GetttingWeatherInformationService : Service() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.notification_icon)
             .setContentTitle(message)
-            .setContentText("現在の状況の確認はこの通知をタップ")
+            .setContentText("この通知をタップしてアプリを起動")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
             .addAction(R.drawable.notification_icon, "アプリ起動", sendPendingIntent)

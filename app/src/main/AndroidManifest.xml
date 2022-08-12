@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.ACTION_BOOT_COMPLETED"/>
 
     <application
-        android:name=".MyCWYApplication"
+        android:name="com.example.clouding_with_you.MyCWYApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,14 +18,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cloudingwithyou">
         <service
-            android:name=".GetttingWeatherInformationService"
+            android:name="com.example.clouding_with_you.GetttingWeatherInformationService"
             android:enabled="true"
             android:exported="false">
         </service>
 
 
         <receiver
-            android:name=".StartupReceiver"
+            android:name="com.example.clouding_with_you.StartupReceiver"
             android:enabled="true"
             android:exported="false"
             android:process="">
@@ -36,7 +36,7 @@
         </receiver>
 
         <receiver
-            android:name=".GetttingWeatherInformationReceiver"
+            android:name="com.example.clouding_with_you.GetttingWeatherInformationReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="TODO"
@@ -67,20 +67,20 @@
             android:value="ca-app-pub-2529783942153390~8957492535"/>
 
         <activity
-            android:name=".SearchMap"
+            android:name="com.example.clouding_with_you.SearchMap"
             android:exported="true"
             android:label="@string/title_activity_search_map" />
         <activity
-            android:name=".Detail"
+            android:name="com.example.clouding_with_you.Detail"
             android:exported="false" />
         <activity
-            android:name=".RegisterCity"
+            android:name="com.example.clouding_with_you.RegisterCity"
             android:exported="false" />
         <activity
-            android:name=".NewPoint"
+            android:name="com.example.clouding_with_you.NewPoint"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.clouding_with_you.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

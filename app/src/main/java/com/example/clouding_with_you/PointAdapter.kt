@@ -7,18 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.DialogInterface
-import android.graphics.Color
-import android.os.Bundle
-import android.view.AbsSavedState
-import android.widget.Button
 import android.widget.RadioButton
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import com.example.clouding_with_you.databinding.ActivityRegisterCityBinding
 import io.realm.Realm
-import io.realm.RealmResults
 import io.realm.kotlin.where
 
 class PointAdapter(data: OrderedRealmCollection<Point>) :
