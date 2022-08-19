@@ -1,8 +1,10 @@
 package com.example.clouding_with_you
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
 class Detail : AppCompatActivity() {
@@ -14,6 +16,8 @@ class Detail : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         val btnhome : ImageButton = findViewById(R.id.homeButtonDetail)
+        val imageView : ImageView = findViewById(R.id.imageView)
+        val url = "https://skart-inc.jimdofree.com/"
 
 //        MobileAds.initialize(this) {}
 //
@@ -26,6 +30,11 @@ class Detail : AppCompatActivity() {
             startActivity(intent)
             finish()
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+
+        imageView.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
         }
     }
 
