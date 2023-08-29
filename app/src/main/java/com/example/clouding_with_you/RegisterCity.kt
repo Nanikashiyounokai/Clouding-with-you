@@ -12,14 +12,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.clouding_with_you.databinding.ActivityRegisterCityBinding
 import io.realm.Realm
 import io.realm.kotlin.where
 
 class RegisterCity : AppCompatActivity() {
 
-    private var _binding: ActivityRegisterCityBinding? = null
-    private val binding get() = _binding!!
     private lateinit var realm: Realm //db関係
 
 //    lateinit var mAdView : AdView
@@ -87,13 +84,13 @@ class RegisterCity : AppCompatActivity() {
                 .setMessage("緯度：$lon 経度：$lat")
                 .setPositiveButton("戻る", null)
 //                    「削除」を押した時の処理
-                .setNegativeButton("削除",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        realm.executeTransaction{
-                            point?.deleteFromRealm()
-                        }
-                    })
-                .show()
+                .setNegativeButton("削除"
+                ) { _, _ ->
+                    realm.executeTransaction {
+                        point?.deleteFromRealm()
+                    }
+                }
+                    .show()
 
                 // OKボタンのインスタンスを取得する
                 val positiveButton = alertDialog5.getButton(DialogInterface.BUTTON_POSITIVE)
@@ -115,7 +112,7 @@ class RegisterCity : AppCompatActivity() {
     private fun checkEmptyOfList() {
         val rvRegisterCity : RecyclerView = findViewById(R.id.rvRegisterCity)
         val tvNothing: TextView = findViewById(R.id.tvNothing)
-        val count = rvRegisterCity.adapter?.let { it.itemCount }?: 0
+        val count = rvRegisterCity.adapter?.itemCount ?: 0
         if(count > 0)
             tvNothing.visibility = View.GONE    // 空でない
         else

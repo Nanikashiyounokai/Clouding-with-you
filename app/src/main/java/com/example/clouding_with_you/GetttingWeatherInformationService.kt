@@ -1,5 +1,6 @@
 package com.example.clouding_with_you
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,11 +8,14 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.realm.Realm
@@ -27,6 +31,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 //アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
+@Suppress("NAME_SHADOWING")
 class GetttingWeatherInformationService : Service() {
 
     private lateinit var realm: Realm
@@ -84,12 +89,11 @@ class GetttingWeatherInformationService : Service() {
 
         val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
 
-        var message: String
-        if(point != null){
-            val city_name: String = point?.point_name.toString()
-            message = "${city_name}で祈願中"
+        val message: String = if(point != null){
+            val city_name: String = point.point_name
+            "${city_name}で祈願中"
         }else{
-            message = "地点登録をしてください。"
+            "地点登録をしてください。"
         }
 
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
@@ -113,7 +117,7 @@ class GetttingWeatherInformationService : Service() {
             realm = Realm.getDefaultInstance()
             val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
             if (point != null){
-                val id:Long = point?.id!!.toLong()
+                val id:Long = point.id
                 gettingWeatherInformation(id)
             }
         }
@@ -158,6 +162,7 @@ class GetttingWeatherInformationService : Service() {
     }
 
     //    URLの検索及び、検索した結果の処理の関数（コルーチンを始める）
+    @OptIn(DelicateCoroutinesApi::class)
     private fun weatherTask(weatherUrl:String, city_name: String) {
 
         GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT){
@@ -270,6 +275,26 @@ class GetttingWeatherInformationService : Service() {
         if(cloudingRate >= 0.3) {
 //    通知のビルド
             with(NotificationManagerCompat.from(this)) {
+                if (ActivityCompat.checkSelfPermission(
+                        this@GetttingWeatherInformationService,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val notificationManager =
+                            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                        val channelId = "channel_id"
+                        val channel = notificationManager.getNotificationChannel(channelId)
+                        if (channel?.importance == NotificationManager.IMPORTANCE_NONE) {
+                            // 通知権限がまだ許可されていない場合、権限を要求する
+                            val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                            intent.putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
+                            startActivity(intent)
+                        }
+                    }
+                    return
+                }
                 notify(notificationId, builder.build())
                 notificationId += 1
             }
