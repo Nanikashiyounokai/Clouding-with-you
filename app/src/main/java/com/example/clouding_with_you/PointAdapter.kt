@@ -17,8 +17,6 @@ class PointAdapter(data: OrderedRealmCollection<Point>) :
     private var listener: ((Long?) -> Unit)? = null
 
 
-    private var checkPosition = -1
-
     fun setOnItemClickListenner(listener:(Long?) -> Unit) {
         this.listener = listener
     }
@@ -43,7 +41,7 @@ class PointAdapter(data: OrderedRealmCollection<Point>) :
 
     //ここでは「Point.kt」(データベース)から項目を取得している。
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
-    override fun onBindViewHolder(holder: PointAdapter.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val point: Point? = getItem(position)
         holder.point_name.text = point?.point_name
         holder.lonlat.text = "緯度："+point?.lat.toString() +"　経度："+ point?.lon.toString()
@@ -70,7 +68,7 @@ class PointAdapter(data: OrderedRealmCollection<Point>) :
                         Realm.getDefaultInstance().where<Point>().equalTo("active", "True")
                             ?.findFirst()
                     truePoint?.active = "False"
-                    point?.active = "True"
+                    point.active = "True"
                 }
             }else{
                 Realm.getDefaultInstance().executeTransaction {

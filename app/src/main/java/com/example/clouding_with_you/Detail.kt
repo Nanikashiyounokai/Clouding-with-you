@@ -15,7 +15,7 @@ class Detail : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        val btnhome : ImageButton = findViewById(R.id.homeButtonDetail)
+        val btnHome : ImageButton = findViewById(R.id.homeButtonDetail)
         val imageView : ImageView = findViewById(R.id.imageView)
         val url = "https://skart-inc.jimdofree.com/"
 
@@ -25,7 +25,7 @@ class Detail : AppCompatActivity() {
 //        val adRequest = AdRequest.Builder().build()
 //        mAdView.loadAd(adRequest)
 
-        btnhome.setOnClickListener {
+        btnHome.setOnClickListener {
             intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()

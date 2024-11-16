@@ -1,32 +1,43 @@
 package com.example.clouding_with_you
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.media.AudioAttributes
 import android.net.Uri
-import android.os.Build
 import android.os.IBinder
-import androidx.annotation.RequiresApi
+import android.provider.Settings
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.realm.Realm
 import io.realm.kotlin.where
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URL
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 import kotlin.concurrent.schedule
 
 //アプリを落としても表示画面外で動き続けるための処理（フォアグラウンド処理）
+@Suppress("NAME_SHADOWING")
 class GetttingWeatherInformationService : Service() {
 
     private lateinit var realm: Realm
@@ -48,12 +59,11 @@ class GetttingWeatherInformationService : Service() {
 
     //    他のActivityがサービスの開始をリクエストした際の処理
     @SuppressLint("UnspecifiedImmutableFlag")
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         //1．常時通知されている通知領域をタップした時に戻ってくる先のActivity
         val openIntent = Intent(this, MainActivity::class.java).let {
-            PendingIntent.getActivity(this, 0, it, 0)
+            PendingIntent.getActivity(this, 0, it, FLAG_IMMUTABLE)
         }
 
         //2．通知チャネル登録
@@ -78,18 +88,17 @@ class GetttingWeatherInformationService : Service() {
         val sendIntent = Intent(this, GetttingWeatherInformationReceiver::class.java).apply {
             action = Intent.ACTION_SEND
         }
-        val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, 0)
+        val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, FLAG_IMMUTABLE)
 
         realm = Realm.getDefaultInstance()
 
         val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
 
-        var message: String
-        if(point != null){
-            val city_name: String = point?.point_name.toString()
-            message = "${city_name}で祈願中"
+        val message: String = if(point != null){
+            val city_name: String = point.point_name
+            "${city_name}で祈願中"
         }else{
-            message = "地点登録をしてください。"
+            "地点登録をしてください。"
         }
 
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
@@ -103,7 +112,7 @@ class GetttingWeatherInformationService : Service() {
             .build()
 
         //5．フォアグラウンド開始。
-        startForeground(2222, notification)
+        startForeground(2222, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
 
 //        データベースから緯度経度参照
 //        緯度経度を入力として曇を通知
@@ -113,7 +122,7 @@ class GetttingWeatherInformationService : Service() {
             realm = Realm.getDefaultInstance()
             val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
             if (point != null){
-                val id:Long = point?.id!!.toLong()
+                val id:Long = point.id
                 gettingWeatherInformation(id)
             }
         }
@@ -146,7 +155,7 @@ class GetttingWeatherInformationService : Service() {
         val lon: Double = point?.lon.toString().toDouble()
         val lat: Double = point?.lat.toString().toDouble()
         val mapDisplay = "lat=${lat}&lon=${lon}"
-        val weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?$mapDisplay&units=metric&lang=ja&appid=$apiKey"
+        val weatherUrl = "https://api.openweathermap.org/data/3.0/onecall?$mapDisplay&units=metric&lang=ja&appid=$apiKey"
         //val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
         //val weatherUrl = "$mainURL&q=tokyo&appid=$apiKey"
 
@@ -158,6 +167,7 @@ class GetttingWeatherInformationService : Service() {
     }
 
     //    URLの検索及び、検索した結果の処理の関数（コルーチンを始める）
+    @OptIn(DelicateCoroutinesApi::class)
     private fun weatherTask(weatherUrl:String, city_name: String) {
 
         GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT){
@@ -200,7 +210,7 @@ class GetttingWeatherInformationService : Service() {
 
     //    天気の情報が入ったJSON形式のデータの処理及びその内容を通知する関数
     @SuppressLint("UnspecifiedImmutableFlag")
-    private  fun weatherJsonTask(result:String, city_name: String) {
+    private fun weatherJsonTask(result:String, city_name: String) {
 
 //    変数の定義
         val jsonObj = JSONObject(result)
@@ -226,26 +236,24 @@ class GetttingWeatherInformationService : Service() {
         val CHANNEL_ID = "channel_id"
 
 //    APIレベルに応じた通知チャンネルの作成（よくわかってない）
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val audioAttributes2 = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
-                .build()
-            val uri2 = Uri.parse("android.resource://$packageName/${R.raw.notification_sound}")
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, "雲量通知", importance).apply {
-                description = "雲量の通知"
-                setSound(uri2,audioAttributes2)
-            }
-            /// チャネルを登録
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val audioAttributes2 = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+            .build()
+        val uri2 = Uri.parse("android.resource://$packageName/${R.raw.notification_sound}")
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(CHANNEL_ID, "雲量通知", importance).apply {
+            description = "雲量の通知"
+            setSound(uri2,audioAttributes2)
         }
+        /// チャネルを登録
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
 
 //    天気の通知をタップした時に画面遷移するための準備
         val openIntent = Intent(this, MainActivity::class.java).let {
-            PendingIntent.getActivity(this, 0, it, 0)
+            PendingIntent.getActivity(this, 0, it, FLAG_IMMUTABLE)
         }
 
 //    天気の通知の詳細をみるために"RegisterCity"に画面遷移するための準備（よくわからない、未実装）
@@ -270,6 +278,24 @@ class GetttingWeatherInformationService : Service() {
         if(cloudingRate >= 0.3) {
 //    通知のビルド
             with(NotificationManagerCompat.from(this)) {
+                if (ActivityCompat.checkSelfPermission(
+                        this@GetttingWeatherInformationService,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    val notificationManager =
+                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    val channelId = "channel_id"
+                    val channel = notificationManager.getNotificationChannel(channelId)
+                    if (channel?.importance == NotificationManager.IMPORTANCE_NONE) {
+                        // 通知権限がまだ許可されていない場合、権限を要求する
+                        val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                        intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                        intent.putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
+                        startActivity(intent)
+                    }
+                    return
+                }
                 notify(notificationId, builder.build())
                 notificationId += 1
             }
