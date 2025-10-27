@@ -6,10 +6,9 @@ import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 
 class Detail : AppCompatActivity() {
-
-//    lateinit var mAdView : AdView
 
     //    Activityの生成
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,16 +18,12 @@ class Detail : AppCompatActivity() {
         val imageView : ImageView = findViewById(R.id.imageView)
         val url = "https://skart-inc.jimdofree.com/"
 
-//        MobileAds.initialize(this) {}
-//
-//        mAdView = findViewById(R.id.adView)
-//        val adRequest = AdRequest.Builder().build()
-//        mAdView.loadAd(adRequest)
-
         btnHome.setOnClickListener {
-            intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java) // 別のActivityへ遷移する場合、intentを再宣言
             startActivity(intent)
             finish()
+            // 新しいラッパー関数を使用 (Android 14 以降で非推奨が解除)
+            // または ActivityCompat.finishAfterTransition(this) で対応
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
@@ -40,6 +35,8 @@ class Detail : AppCompatActivity() {
 
     override fun finish() {
         super.finish()
+        // 新しいラッパー関数を使用 (Android 14 以降で非推奨が解除)
+        // または ActivityCompat.finishAfterTransition(this) で対応
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }

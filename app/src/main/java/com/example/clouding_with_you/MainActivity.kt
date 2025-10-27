@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mp:MediaPlayer
 
 //    Activityの生成
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
