@@ -20,10 +20,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.realm.Realm
 import io.realm.kotlin.where
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
@@ -40,13 +40,21 @@ import kotlin.concurrent.schedule
 @Suppress("NAME_SHADOWING")
 class GetttingWeatherInformationService : Service() {
 
-    private lateinit var realm: Realm
+    //    onStartCommand は START_STICKY やアプリ起動のたびに何度でも呼ばれる。
+    //    Timer を毎回作ると通知が多重に飛ぶので、1本だけ持って作り直す。
+    private var notificationTimer: Timer? = null
+
+    //    サービスが死んだら通信も止まるようにする
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     //    クラス内に作成されるSingletonがcompanion object
 //    クラス内のインスタンスがただ1つだけ存在する状態にしたいのがSingleton
 //    つまりここで何をやってるかはよくわからない
     companion object {
         const val CHANNEL_ID = "1111"
+
+        // 曇り通知は常に同じ ID で上書きする（通知欄を埋め尽くさないため）
+        private const val NOTIFY_ID_CLOUDING = 3333
     }
 
     //    他のActivityがサービスにバインドするときにbindService()を呼び出した際の処理
@@ -90,15 +98,10 @@ class GetttingWeatherInformationService : Service() {
         }
         val sendPendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, FLAG_IMMUTABLE)
 
-        realm = Realm.getDefaultInstance()
-
-        val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
-
-        val message: String = if(point != null){
-            val city_name: String = point.point_name
-            "${city_name}で祈願中"
-        }else{
-            "地点登録をしてください。"
+        // Realm は開いたら必ず閉じる。以前はここと Timer の中で開きっぱなしだった
+        val message: String = Realm.getDefaultInstance().use { realm ->
+            val point = realm.where<Point>().equalTo("active", "True").findFirst()
+            if (point != null) "${point.point_name}で祈願中" else "地点登録をしてください。"
         }
 
         //4．通知の作成（ここでPendingIntentを通知領域に渡す）
@@ -119,16 +122,20 @@ class GetttingWeatherInformationService : Service() {
 
 //    繰り返し通知するための時間設定（現在はServiceが開始してから30分ごと）
         val notificationInterval: TimerTask.() -> Unit = {
-            realm = Realm.getDefaultInstance()
-            val point = realm.where<Point>().equalTo("active", "True")?.findFirst()
-            if (point != null){
-                val id:Long = point.id
-                gettingWeatherInformation(id)
+            // Timer は別スレッドなので Realm もこのスレッドで開き直す必要がある。
+            // 以前は毎回開くだけで閉じていなかった
+            val activeId: Long? = Realm.getDefaultInstance().use { realm ->
+                realm.where<Point>().equalTo("active", "True").findFirst()?.id
+            }
+            if (activeId != null) {
+                gettingWeatherInformation(activeId)
             }
         }
 
         //Timer().schedule(0, 1800000, notificationInterval)
-        Timer().schedule(0, 600000, notificationInterval)
+        //    前回の Timer が生きていれば必ず止めてから張り直す
+        notificationTimer?.cancel()
+        notificationTimer = Timer().apply { schedule(0, 600000, notificationInterval) }
 
 //    システムがサービスを強制終了した場合に、サービスをどのように続行するかを示す
 //    これは「強制終了した場合、サービスを再作成しonStartCommand() を呼び出すが、最後のインテントは再配信しない。
@@ -142,18 +149,26 @@ class GetttingWeatherInformationService : Service() {
         return super.stopService(name)
     }
 
+    //    Android 15 以降、dataSync のフォアグラウンドサービスは 24 時間あたり計 6 時間で
+    //    タイムアウトする。ここで自分から止めないと ANR / 強制終了になる。
+    override fun onTimeout(startId: Int) {
+        stopSelf()
+    }
+
 //    各ライフサイクル内で使う関数の定義
 
     //    APIキーを含むURLを入力して天気の情報を受け取る関数
     private fun gettingWeatherInformation(id: Long) {
-        val point = realm.where<Point>().equalTo("id", id)?.findFirst()
-        val city_name: String = point?.point_name.toString()
+        // 地点が削除された直後などは null になる。
+        // 以前はそのまま進んで "null".toDouble() で NumberFormatException になっていた
+        val snapshot = Realm.getDefaultInstance().use { realm ->
+            realm.where<Point>().equalTo("id", id).findFirst()
+                // Double をわざわざ文字列にしてから戻していたので、そのまま使う
+                ?.let { Triple(it.point_name, it.lat, it.lon) }
+        } ?: return
+        val (city_name, lat, lon) = snapshot
 //    APIキーを含むURLの定義
         val apiKey = "f88bde919fb0a4b898de3a29d6f0c421"
-        //val lon = 139.77 //経度を代入（仮に東京を代入）
-        //val lat = 35.68  //緯度を代入（仮に東京を代入）
-        val lon: Double = point?.lon.toString().toDouble()
-        val lat: Double = point?.lat.toString().toDouble()
         val mapDisplay = "lat=${lat}&lon=${lon}"
         val weatherUrl = "https://api.openweathermap.org/data/3.0/onecall?$mapDisplay&units=metric&lang=ja&appid=$apiKey"
         //val mainURL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
@@ -167,10 +182,10 @@ class GetttingWeatherInformationService : Service() {
     }
 
     //    URLの検索及び、検索した結果の処理の関数（コルーチンを始める）
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun weatherTask(weatherUrl:String, city_name: String) {
-
-        GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT){
+    //    GlobalScope だとサービスを止めても通信が走り続けるので、
+    //    サービスと寿命を合わせたスコープを使う（onDestroy で cancel）
+    private fun weatherTask(weatherUrl: String, city_name: String) {
+        serviceScope.launch {
 
 //            入力されたURLの検索
             val result = weatherBackgroundTask(weatherUrl)
@@ -209,46 +224,52 @@ class GetttingWeatherInformationService : Service() {
     }
 
     //    天気の情報が入ったJSON形式のデータの処理及びその内容を通知する関数
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun weatherJsonTask(result:String, city_name: String) {
+    private fun weatherJsonTask(result: String, city_name: String) {
 
-//    変数の定義
-        val jsonObj = JSONObject(result)
+        // 通信に失敗すると空文字が返ってくる。
+        // 以前はそのまま JSONObject("") に渡していて JSONException で落ちていた。
+        // API がエラーを返したとき（キー切れ・プラン外など）も同じ経路で落ちる。
+        val cloudingRate: Double = try {
+            val jsonObj = JSONObject(result)
 
-        //現在の雲量を取得
-        val weatherNowJSONObject = jsonObj.getJSONObject("current")
-        val nowClouds = weatherNowJSONObject.getInt("clouds")
+            //現在の雲量を取得
+            val weatherNowJSONObject = jsonObj.getJSONObject("current")
+            val nowClouds = weatherNowJSONObject.getInt("clouds")
 
-        //未来の雲量を取得
-        val weatherFutureJSONArray = jsonObj.getJSONArray("hourly")
-        val weatherFutureJSONObject = weatherFutureJSONArray.getJSONObject(1)
-        val futureClouds = weatherFutureJSONObject.getInt("clouds")
+            //未来の雲量を取得
+            val weatherFutureJSONArray = jsonObj.getJSONArray("hourly")
+            val weatherFutureJSONObject = weatherFutureJSONArray.getJSONObject(1)
+            val futureClouds = weatherFutureJSONObject.getInt("clouds")
 
-        //何分後かを計算
-        val nowTime = weatherNowJSONObject.getInt("dt")
-        val futureTime = weatherFutureJSONObject.getInt("dt")
-        val minute: Int = (futureTime - nowTime) / 60
-        //曇り率計算（全て少数型で計算）
-        val cloudingRate:Double = (futureClouds.toDouble()-nowClouds.toDouble())/minute.toDouble()
+            //何分後かを計算
+            val minute = (weatherFutureJSONObject.getInt("dt") - weatherNowJSONObject.getInt("dt")) / 60
+            if (minute == 0) return
+            //曇り率計算（全て少数型で計算）
+            (futureClouds - nowClouds).toDouble() / minute
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            return
+        }
+
+        if (cloudingRate < 0.3) return
 
 //    通知をするための準備
-        var notificationId = 0
-        val CHANNEL_ID = "channel_id"
+        val notifyChannelId = "channel_id"
 
-//    APIレベルに応じた通知チャンネルの作成（よくわかってない）
+//    APIレベルに応じた通知チャンネルの作成
         val audioAttributes2 = AudioAttributes.Builder()
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
             .build()
         val uri2 = Uri.parse("android.resource://$packageName/${R.raw.notification_sound}")
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(CHANNEL_ID, "雲量通知", importance).apply {
+        val channel = NotificationChannel(
+            notifyChannelId, "雲量通知", NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
             description = "雲量の通知"
-            setSound(uri2,audioAttributes2)
+            setSound(uri2, audioAttributes2)
         }
         /// チャネルを登録
-        val notificationManager: NotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
 
 //    天気の通知をタップした時に画面遷移するための準備
@@ -263,7 +284,7 @@ class GetttingWeatherInformationService : Service() {
 //        val RegisterCityIntent = PendingIntent.getBroadcast(this, 0, activityIntent, 0)
 
 //    通知の詳細
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(this, notifyChannelId)
             .setSmallIcon(R.drawable.notification_icon)  /// 表示されるアイコン
             .setContentTitle("${city_name}の上空")                     /// 通知タイトル（仮に東京を代入）
             .setContentText("ねぇ、今から曇るよ")  /// 通知コンテンツ
@@ -275,36 +296,35 @@ class GetttingWeatherInformationService : Service() {
         /// この通知にボタンを追加する
 //            .setAutoCancel(true)                           /// 何らかで画面遷移した時にこの通知を消す
 
-        if(cloudingRate >= 0.3) {
 //    通知のビルド
-            with(NotificationManagerCompat.from(this)) {
-                if (ActivityCompat.checkSelfPermission(
-                        this@GetttingWeatherInformationService,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    val notificationManager =
-                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    val channelId = "channel_id"
-                    val channel = notificationManager.getNotificationChannel(channelId)
-                    if (channel?.importance == NotificationManager.IMPORTANCE_NONE) {
-                        // 通知権限がまだ許可されていない場合、権限を要求する
-                        val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-                        intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-                        intent.putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
-                        startActivity(intent)
-                    }
-                    return
-                }
-                notify(notificationId, builder.build())
-                notificationId += 1
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            // 通知が許可されていないときは設定画面へ誘導する。
+            // Service から startActivity するには FLAG_ACTIVITY_NEW_TASK が必須で、
+            // 無いと AndroidRuntimeException で落ちていた。
+            if (notificationManager.getNotificationChannel(notifyChannelId)?.importance
+                == NotificationManager.IMPORTANCE_NONE
+            ) {
+                val settingsIntent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                    .putExtra(Settings.EXTRA_CHANNEL_ID, notifyChannelId)
+                startActivity(settingsIntent)
             }
+            return
         }
 
+        // 以前はローカル変数を 0 で作って通知後に +1 していたが、
+        // 関数を抜けると消えるので毎回 0 のまま＝通知が毎回上書きされていた
+        NotificationManagerCompat.from(this).notify(NOTIFY_ID_CLOUDING, builder.build())
     }
 
+    //    Timer と Realm を後始末する。Timer を止めないと停止後もタイマーが動き続ける
     override fun onDestroy() {
+        notificationTimer?.cancel()
+        notificationTimer = null
+        serviceScope.cancel()
         super.onDestroy()
-        realm.close()
     }
 }

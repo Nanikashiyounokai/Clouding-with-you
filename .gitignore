@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# 署名鍵のパスワード（絶対にコミットしない）
+keystore.properties

@@ -1,12 +1,13 @@
 package com.example.clouding_with_you
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -15,109 +16,79 @@ import androidx.recyclerview.widget.RecyclerView
 import io.realm.Realm
 import io.realm.kotlin.where
 
+@Suppress("DEPRECATION") // overridePendingTransition は API 34 で非推奨だが動作する
 class RegisterCity : AppCompatActivity() {
 
     private lateinit var realm: Realm //db関係
+    private lateinit var rvRegisterCity: RecyclerView
+    private lateinit var tvNothing: TextView
 
-//    lateinit var mAdView : AdView
-
-    //    Activityの生成(新)
-    @SuppressLint("SetTextI18n")
+    //    Activityの生成
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_city)
-        checkEmptyOfList()
 
         realm = Realm.getDefaultInstance() //db関係　Realmデータベースを使用する準備
 
-//        MobileAds.initialize(this) {}
-//
-//        mAdView = findViewById(R.id.adView)
-//        val adRequest = AdRequest.Builder().build()
-//        mAdView.loadAd(adRequest)
-
         //変数の定義
-        val btnNewPointFronReg : Button = findViewById(R.id.btnNewPointFronReg)
-
-        val rvRegisterCity : RecyclerView = findViewById(R.id.rvRegisterCity)
-
-        val btnhome : ImageButton = findViewById(R.id.homeButtonReg)
-
+        val btnNewPointFronReg: Button = findViewById(R.id.btnNewPointFronReg)
+        val btnhome: ImageButton = findViewById(R.id.homeButtonReg)
+        rvRegisterCity = findViewById(R.id.rvRegisterCity)
+        tvNothing = findViewById(R.id.tvNothing)
 
 //      「新規地点登録画面へ移動」を押した時の処理
         btnNewPointFronReg.setOnClickListener {
-//            "NewPoint.kt"に画面遷移
-            intent = Intent(this, NewPoint::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, NewPoint::class.java))
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
-        
-        
-        btnhome.setOnClickListener {
-            intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
+
+        btnhome.setOnClickListener { backToTitle() }
 
         //RecyclerViewにアダプターとレイアウトマネージャーを設定する
         rvRegisterCity.layoutManager = LinearLayoutManager(this)
-        val points = realm.where<Point>().findAll()
-        val adapter = PointAdapter(points)
+        val adapter = PointAdapter(realm.where<Point>().findAll())
         rvRegisterCity.adapter = adapter
 
-        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
-        rvRegisterCity.addItemDecoration(dividerItemDecoration)
+        // 区切り線。向きを知るためだけに LayoutManager をもう 1 つ作る必要はない
+        rvRegisterCity.addItemDecoration(
+            DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
+        )
 
-        checkEmptyOfList()
-
+        // 件数が変わったら「登録地点なし」の表示を切り替える。
+        // 以前は onCreate で数えるだけ（しかもアダプター設定前にも 1 回呼んでいた）だったので、
+        // 最後の 1 件を削除しても案内文が出ないままだった。
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() = updateEmptyView()
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = updateEmptyView()
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = updateEmptyView()
+        })
+        updateEmptyView()
 
         //登録地点の枠内をクリックしたときの処理
-        adapter.setOnItemClickListenner { id ->
-            val point = realm.where<Point>().equalTo("id", id)?.findFirst()
-            val point_name = point?.point_name
-            val lon = point?.lon
-            val lat = point?.lat
-            id?.let {
-                val alertDialog5 = AlertDialog.Builder(this)
-                .setTitle("「$point_name」の詳細")
-                .setMessage("緯度：$lon 経度：$lat")
+        adapter.setOnItemClickListener listener@{ id ->
+            if (id == null) return@listener
+            val point = realm.where<Point>().equalTo("id", id).findFirst() ?: return@listener
+
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("「${point.point_name}」の詳細")
+                .setMessage("緯度：${point.lat} 経度：${point.lon}")
                 .setPositiveButton("戻る", null)
 //                    「削除」を押した時の処理
-                .setNegativeButton("削除"
-                ) { _, _ ->
-                    realm.executeTransaction {
-                        point?.deleteFromRealm()
-                    }
+                .setNegativeButton("削除") { _, _ ->
+                    realm.executeTransaction { point.deleteFromRealm() }
                 }
-                    .show()
+                .show()
 
-                // OKボタンのインスタンスを取得する
-                val positiveButton = alertDialog5.getButton(DialogInterface.BUTTON_POSITIVE)
-                // OKボタンの色を変更する
-                positiveButton.setTextColor(Color.BLACK)
-
-                // OKボタンのインスタンスを取得する
-                val negativeButton = alertDialog5.getButton(DialogInterface.BUTTON_NEGATIVE)
-                // OKボタンの色を変更する
-                negativeButton.setTextColor(Color.BLACK)
-
-            }
-
+            // ボタンの文字色を変更する
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.BLACK)
+            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.BLACK)
         }
-
     }
 
     //listが空かどうか判断
-    private fun checkEmptyOfList() {
-        val rvRegisterCity : RecyclerView = findViewById(R.id.rvRegisterCity)
-        val tvNothing: TextView = findViewById(R.id.tvNothing)
+    private fun updateEmptyView() {
         val count = rvRegisterCity.adapter?.itemCount ?: 0
-        if(count > 0)
-            tvNothing.visibility = View.GONE    // 空でない
-        else
-            tvNothing.visibility = View.VISIBLE  // 空である           
-
+        tvNothing.visibility = if (count > 0) View.GONE else View.VISIBLE
     }
 
     override fun finish() {
@@ -125,11 +96,9 @@ class RegisterCity : AppCompatActivity() {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-
     //db関係
     override fun onDestroy() {
-        super.onDestroy()
         realm.close()
+        super.onDestroy()
     }
 }
-

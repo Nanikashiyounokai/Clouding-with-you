@@ -1,23 +1,23 @@
 package com.example.clouding_with_you
+
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import io.realm.OrderedRealmCollection
-import io.realm.RealmRecyclerViewAdapter
-import android.annotation.SuppressLint
-import android.widget.RadioButton
 import io.realm.Realm
+import io.realm.RealmRecyclerViewAdapter
 import io.realm.kotlin.where
 
 class PointAdapter(data: OrderedRealmCollection<Point>) :
-        RealmRecyclerViewAdapter<Point, PointAdapter.ViewHolder>(data, true) {
+    RealmRecyclerViewAdapter<Point, PointAdapter.ViewHolder>(data, true) {
 
     private var listener: ((Long?) -> Unit)? = null
 
-
-    fun setOnItemClickListenner(listener:(Long?) -> Unit) {
+    fun setOnItemClickListener(listener: (Long?) -> Unit) {
         this.listener = listener
     }
 
@@ -26,60 +26,55 @@ class PointAdapter(data: OrderedRealmCollection<Point>) :
     }
 
     class ViewHolder(cell: View) : RecyclerView.ViewHolder(cell) {
-        val point_name: TextView = cell.findViewById(R.id.tvPointTitle)
-        val lonlat: TextView = cell.findViewById(R.id.tvLonLat)
-        val radio_button: RadioButton = cell.findViewById(R.id.radio_button)
-        val tv_check: TextView = cell.findViewById(R.id.tv_check)
+        val pointName: TextView = cell.findViewById(R.id.tvPointTitle)
+        val lonLat: TextView = cell.findViewById(R.id.tvLonLat)
+        val radioButton: RadioButton = cell.findViewById(R.id.radio_button)
+        val tvCheck: TextView = cell.findViewById(R.id.tv_check)
     }
 
     //ここでは「rv_detail.xml」のレイアウトを適用させている
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.rv_detail, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.rv_detail, parent, false)
         return ViewHolder(view)
     }
 
     //ここでは「Point.kt」(データベース)から項目を取得している。
-    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        val point: Point? = getItem(position)
-        holder.point_name.text = point?.point_name
-        holder.lonlat.text = "緯度："+point?.lat.toString() +"　経度："+ point?.lon.toString()
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // 削除直後などに null が返ることがあるので、その場合は何も描かない
+        val point = getItem(position) ?: return
+
+        holder.pointName.text = point.point_name
+        holder.lonLat.text = "緯度：${point.lat}　経度：${point.lon}"
 
         // セルに使用しているビューがタップされたときのイベント
-        holder.itemView.setOnClickListener {
-            listener?.invoke(point?.id)
-        }
+        holder.itemView.setOnClickListener { listener?.invoke(point.id) }
 
-        if(point?.active.equals("True")) {
-            holder.radio_button.isChecked = true
-            holder.tv_check.visibility = View.VISIBLE
-        }
-        else {
-            holder.radio_button.isChecked = false
-            holder.tv_check.visibility = View.GONE
-        }
+        // equals("True") ではなく == で比較する
+        val isActive = point.active == "True"
+        holder.radioButton.isChecked = isActive
+        holder.tvCheck.visibility = if (isActive) View.VISIBLE else View.GONE
 
-        //ラジオボタンが更新された時、「notifyDataSetChanged()」で全データを更新
-        holder.radio_button.setOnClickListener {
-            if(point?.active == "False") {
-                Realm.getDefaultInstance().executeTransaction {
-                    val truePoint =
-                        Realm.getDefaultInstance().where<Point>().equalTo("active", "True")
-                            ?.findFirst()
-                    truePoint?.active = "False"
-                    point.active = "True"
-                }
-            }else{
-                Realm.getDefaultInstance().executeTransaction {
-                    point?.active = "False"
+        holder.radioButton.setOnClickListener {
+            // Realm.getDefaultInstance() は呼ぶたびに参照カウントが増える。
+            // 以前は 1 回のタップで最大 3 個開いて 1 つも閉じていなかった。
+            // use {} で必ず閉じる。
+            Realm.getDefaultInstance().use { realm ->
+                realm.executeTransaction { db ->
+                    if (point.active == "True") {
+                        // 祈願中を解除する
+                        point.active = "False"
+                    } else {
+                        // 祈願中は 1 地点だけなので、今の祈願中を解除してから付け替える
+                        db.where<Point>().equalTo("active", "True").findFirst()?.active = "False"
+                        point.active = "True"
+                    }
                 }
             }
-            notifyDataSetChanged()
+            // RealmRecyclerViewAdapter(data, autoUpdate = true) なので
+            // notifyDataSetChanged() を呼ばなくても一覧は自動で更新される
         }
     }
 
-    override fun getItemId(position: Int): Long {
-        return getItem(position)?.id ?: 0
-    }
+    override fun getItemId(position: Int): Long = getItem(position)?.id ?: 0
 }

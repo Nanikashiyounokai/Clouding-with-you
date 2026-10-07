@@ -61,7 +61,6 @@
     <inspection_tool class="AndroidLintExportedPreferenceActivity" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintExportedReceiver" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintExportedService" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="AndroidLintExtraText" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintFileEndsWithExt" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintFindViewByIdCast" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintGetInstance" enabled="true" level="ERROR" enabled_by_default="true" />
@@ -215,7 +214,6 @@
     <inspection_tool class="AndroidLintUnsafeDynamicallyLoadedCode" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUnsafeNativeCodeLocation" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUnsafeProtectedBroadcastReceiver" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="AndroidLintUnspecifiedImmutableFlag" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUnsupportedChromeOsCameraSystemFeature" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUntranslatable" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUnusedAttribute" enabled="true" level="ERROR" enabled_by_default="true" />
@@ -228,7 +226,6 @@
     <inspection_tool class="AndroidLintUseCompoundDrawables" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUseOfBundledGooglePlayServices" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUseSparseArrays" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="AndroidLintUseSwitchCompatOrMaterialXml" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUseValueOf" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUselessLeaf" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintUselessParent" enabled="true" level="ERROR" enabled_by_default="true" />
@@ -241,7 +238,6 @@
     <inspection_tool class="AndroidLintVisibleForTests" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintWakelockTimeout" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintWatchFaceEditor" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="AndroidLintWearStandaloneAppFlag" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintWearableConfigurationAction" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintWebViewApiAvailability" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="AndroidLintWebViewClientOnReceivedSslError" enabled="true" level="ERROR" enabled_by_default="true" />
