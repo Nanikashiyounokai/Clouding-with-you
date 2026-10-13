@@ -13,4 +13,4 @@ crons = ["*/10 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "clouding-with-you"
-database_id = "TODO-wrangler-d1-create"
+database_id = "d9d22e13-09c6-4572-bbd5-7d4e59d9e846"

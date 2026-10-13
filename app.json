@@ -2,6 +2,7 @@
   "expo": {
     "name": "曇天気の娘",
     "slug": "clouding-with-you",
+    "owner": "skart-inc",
     "scheme": "cloudingwithyou",
     "version": "2.0.0",
     "orientation": "portrait",
@@ -31,6 +32,15 @@
       "blockedPermissions": [
         "android.permission.READ_PHONE_STATE",
         "android.permission.ACCESS_BACKGROUND_LOCATION"
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "com.google.android.gms.permission.AD_ID"
       ]
     },
     "plugins": [
@@ -47,7 +57,9 @@
         {
           "icon": "./assets/images/notification-icon.png",
           "color": "#3F8ACC",
-          "sounds": ["./assets/sounds/notification_sound.wav"]
+          "sounds": [
+            "./assets/sounds/notification_sound.wav"
+          ]
         }
       ],
       [
@@ -96,7 +108,11 @@
       "expo-asset"
     ],
     "extra": {
-      "apiBaseUrl": ""
+      "apiBaseUrl": "https://clouding-with-you.skart20220220.workers.dev",
+      "router": {},
+      "eas": {
+        "projectId": "4a14eca1-3a98-4c61-81c5-495f7fcc21ee"
+      }
     },
     "experiments": {
       "typedRoutes": true
