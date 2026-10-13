@@ -111,7 +111,10 @@ class GetttingWeatherInformationService : Service() {
             .setContentText("この通知をタップしてアプリを起動")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(openIntent)
-            .addAction(R.drawable.notification_icon, "アプリ起動", sendPendingIntent)
+            // このボタンの行き先は GetttingWeatherInformationReceiver で、中身はサービスの停止。
+            // 以前は「アプリ起動」と書いてあり、押すとアプリが開かずに見張りだけ止まっていた。
+            // アプリを開くのは通知本体のタップ（setContentIntent）で足りるので、ボタンは実際の動作に合わせる。
+            .addAction(R.drawable.notification_icon, "観測を停止", sendPendingIntent)
             .build()
 
         //5．フォアグラウンド開始。
