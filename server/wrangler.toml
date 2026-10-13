@@ -1,0 +1,16 @@
+# 曇天気の娘 — 曇り通知サーバー
+# デプロイ前に人がやること（README 参照）:
+#   1. npx wrangler d1 create clouding-with-you → 出てきた database_id を下に書く
+#   2. npx wrangler d1 execute clouding-with-you --remote --file=schema.sql
+#   3. npx wrangler secret put OPENWEATHER_API_KEY
+name = "clouding-with-you"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["*/10 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "clouding-with-you"
+database_id = "TODO-wrangler-d1-create"

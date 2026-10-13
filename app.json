@@ -1,0 +1,105 @@
+{
+  "expo": {
+    "name": "曇天気の娘",
+    "slug": "clouding-with-you",
+    "scheme": "cloudingwithyou",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "com.skart.cloudingwithyou",
+      "buildNumber": "1",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.skart.clouding_with_you",
+      "versionCode": 9,
+      "adaptiveIcon": {
+        "backgroundColor": "#3F8ACC",
+        "foregroundImage": "./assets/images/icon-foreground.png"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyACVKP_nGLz4QUUpu0nm5q-Pz5J4Nm8_hc"
+        }
+      },
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.ACCESS_BACKGROUND_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#3F8ACC",
+          "sounds": ["./assets/sounds/notification_sound.wav"]
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "現在地を観測地点として登録するために使います。"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/title_white2.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#3F8ACC"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-2529783942153390~8957492535",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "delayAppMeasurementInit": true,
+          "userTrackingUsageDescription": "あなたに合った広告を表示するために使用します。"
+        }
+      ],
+      "./plugins/withAndroidGradleFixes",
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "あなたに合った広告を表示するために使用します。"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 29,
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "extraProguardRules": "# realm-js の JNI から名前で参照されるクラス（R8 で消すと起動時に落ちる）\n-keep class io.realm.react.** { *; }\n"
+          }
+        }
+      ],
+      "expo-font",
+      "expo-asset"
+    ],
+    "extra": {
+      "apiBaseUrl": ""
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
