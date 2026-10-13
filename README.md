@@ -25,18 +25,18 @@
 
 ## 公開前に人がやること
 
-| # | 作業 | どこ |
+2026-10-14 時点の状況。
+
+| # | 作業 | 状況 |
 | --- | --- | --- |
-| 1 | `npx eas-cli@latest init` で EAS プロジェクトを作る（`extra.eas.projectId` が入る。無いとプッシュが届かない） | ターミナル |
-| 2 | Cloudflare に D1 を作り、`server/wrangler.toml` の `database_id` を書く。`schema.sql` を流す | `server/` |
-| 3 | `npx wrangler secret put OPENWEATHER_API_KEY`（旧版と同じキーで可。One Call 3.0 の無料枠は 1,000 回／日 ≒ 7 地域） | `server/` |
-| 4 | `npx wrangler deploy` し、出てきた URL を `app.json` の `extra.apiBaseUrl` に書く | `server/` |
-| 5 | AdMob でアプリ起動広告のユニットを作り、`src/ads/config.ts` の `production` に書く（Android は旧版のアプリ pub-2529… に追加） | AdMob |
-| 6 | AdMob に iOS アプリを登録し、`app.json` の `iosAppId` を差し替える（今は Google のサンプル ID） | AdMob |
-| 7 | iOS の Bundle ID（仮 `com.skart.cloudingwithyou`）で App Store Connect にアプリを作る | ASC |
-| 8 | アプリアイコンの 1024px 原画を `assets/images/icon.png` に置く（今は 432px を拡大した仮） | — |
-| 9 | Android の署名鍵（`~/Desktop/SKart/その他/Key.jks`）を EAS に登録。旧版と同じ鍵でないとアップデートにならない | EAS |
-| 10 | 両ストアのデータ申告（位置情報・広告 ID・プッシュトークン）を直す | Play / ASC |
+| 1 | EAS プロジェクト | **済**（@skart-inc/clouding-with-you・eas.json あり） |
+| 2 | 通知サーバー（Cloudflare Workers + D1） | **デプロイ済**（https://clouding-with-you.skart20220220.workers.dev）。**OpenWeather のキーを人が入れる**：`cd server && npx wrangler secret put OPENWEATHER_API_KEY` |
+| 3 | プッシュの認証情報 | **人**：Android は Firebase の FCM V1 サービスアカウント鍵、iOS は APNs 鍵を `npx eas-cli credentials` で登録。無いと通知が届かない |
+| 4 | AdMob（起動広告ユニット・GDPR 同意メッセージ・iOS アプリ） | **人**：アプリ ID の pub-2529… を持つ Google アカウントが Chrome のログイン中アカウントに見当たらなかった。どのアカウントか確認が要る |
+| 5 | iOS の Bundle ID | **決定** `com.skart.cloudingwithyou`。App Store Connect でのアプリ作成は人 |
+| 6 | アプリアイコン 1024px | **済**（デザイン原画から切り出し） |
+| 7 | Android の署名鍵を EAS に登録 | **人**：`~/Desktop/SKart/その他/Key.jks`。旧版と同じ鍵でないとアップデートにならない |
+| 8 | 両ストアのデータ申告・プライバシーポリシー | **人**：下書きは SKart/アプリ開発/01_曇天気の娘/2026-10-14_ストア申告の下書き.md |
 
 ## 開発
 
