@@ -48,3 +48,6 @@ yarn-error.*
 server/node_modules/
 server/.wrangler/
 server/.dev.vars
+
+# Firebase の設定（公開リポジトリには置かない。EAS は環境変数 GOOGLE_SERVICES_JSON）
+google-services.json
