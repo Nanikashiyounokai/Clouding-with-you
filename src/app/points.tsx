@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { useDialog } from '../components/Dialog';
-import { Header, PrimaryButton, Sky, T } from '../components/ui';
+import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
 import type { Point } from '../domain/points';
 import { describeCloud, useLastCloudy } from '../lastCloudy';
 import { useStore, type NotifyStatus } from '../store';
@@ -98,6 +98,7 @@ export default function Points() {
 
       <View style={styles.footer}>
         <PrimaryButton label="新規地点登録" onPress={() => router.replace('/new-point')} />
+        <BackToTitle />
       </View>
     </Sky>
   );
@@ -118,5 +119,5 @@ const styles = StyleSheet.create({
   prayOn: { backgroundColor: colors.blue },
   prayText: { color: colors.blueDeep, fontSize: 13, lineHeight: 20 },
   prayTextOn: { color: colors.white },
-  footer: { paddingHorizontal: 20, paddingBottom: 12, paddingTop: 4 },
+  footer: { paddingHorizontal: 20, paddingBottom: 4, paddingTop: 4, gap: 4 },
 });

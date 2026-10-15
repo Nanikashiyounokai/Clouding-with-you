@@ -6,7 +6,7 @@ import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable,
 import MapView, { Marker, type MapPressEvent } from 'react-native-maps';
 
 import { useDialog } from '../components/Dialog';
-import { Header, PrimaryButton, SecondaryButton, Sky, T } from '../components/ui';
+import { BackToTitle, Header, PrimaryButton, SecondaryButton, Sky, T } from '../components/ui';
 import { MAX_POINTS, round4, validate } from '../domain/points';
 import { useStore } from '../store';
 import { colors, fonts } from '../theme';
@@ -166,6 +166,7 @@ export default function NewPoint() {
           <View style={styles.actions}>
             <PrimaryButton label="この地点を登録する" onPress={save} />
             <SecondaryButton label="登録地点を見る" onPress={() => router.replace('/points')} />
+            <BackToTitle />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

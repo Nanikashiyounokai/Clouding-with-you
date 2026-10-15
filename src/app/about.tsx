@@ -1,7 +1,7 @@
 import * as WebBrowser from 'expo-web-browser';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Header, Sky, T } from '../components/ui';
+import { BackToTitle, Header, Sky, T } from '../components/ui';
 import { colors } from '../theme';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
@@ -48,6 +48,7 @@ export default function About() {
           <T style={styles.made}>made by</T>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" accessibilityLabel="SKart" />
         </Pressable>
+        <BackToTitle />
       </ScrollView>
     </Sky>
   );
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
   num: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.blue, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   numText: { fontSize: 14, lineHeight: 20 },
   stepText: { flex: 1, color: colors.ink, fontSize: 14, lineHeight: 23 },
-  logoWrap: { alignItems: 'center', marginTop: 40 },
+  logoWrap: { alignItems: 'center', marginTop: 40, marginBottom: 16 },
   made: { color: colors.ink, fontSize: 11, lineHeight: 16 },
   logo: { width: 120, height: 38 },
 });
