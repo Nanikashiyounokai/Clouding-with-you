@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 
+import { AdBanner } from '../ads/AdsProvider';
 import { useDialog } from '../components/Dialog';
 import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
 import type { Point } from '../domain/points';
@@ -100,6 +101,7 @@ export default function Points() {
         <PrimaryButton label="新規地点登録" onPress={() => router.replace('/new-point')} />
         <BackToTitle />
       </View>
+      <AdBanner />
     </Sky>
   );
 }

@@ -1,7 +1,8 @@
 import * as WebBrowser from 'expo-web-browser';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { BackToTitle, Header, Sky, T } from '../components/ui';
+import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
+import { openStorePage } from '../review';
 import { colors } from '../theme';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
@@ -44,6 +45,11 @@ export default function About() {
           ))}
         </View>
 
+        <View style={styles.rate}>
+          <T style={styles.rateLead}>{'気に入っていただけたら、\n評価をいただけるとうれしいです。'}</T>
+          <PrimaryButton label="このアプリを評価する" onPress={() => openStorePage().catch(() => {})} />
+        </View>
+
         <Pressable onPress={() => WebBrowser.openBrowserAsync(SKART_URL).catch(() => {})} accessibilityRole="link" style={styles.logoWrap}>
           <T style={styles.made}>made by</T>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" accessibilityLabel="SKart" />
@@ -65,6 +71,8 @@ const styles = StyleSheet.create({
   num: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.blue, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   numText: { fontSize: 14, lineHeight: 20 },
   stepText: { flex: 1, color: colors.ink, fontSize: 14, lineHeight: 23 },
+  rate: { alignSelf: 'stretch', marginTop: 28, gap: 12 },
+  rateLead: { fontSize: 14, lineHeight: 23, textAlign: 'center' },
   logoWrap: { alignItems: 'center', marginTop: 40, marginBottom: 16 },
   made: { color: colors.ink, fontSize: 11, lineHeight: 16 },
   logo: { width: 120, height: 38 },

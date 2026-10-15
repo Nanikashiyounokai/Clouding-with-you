@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AdsProvider } from '../ads/AdsProvider';
 import { DialogProvider } from '../components/Dialog';
 import { setupNotifications } from '../push';
+import { recordFirstLaunch } from '../review';
 import { StoreProvider } from '../store';
 import { colors, fonts } from '../theme';
 
@@ -38,6 +39,7 @@ function useBgm() {
 export default function RootLayout() {
   useEffect(() => {
     setupNotifications().catch((e) => console.warn('notification setup failed', e));
+    recordFirstLaunch().catch(() => {});
   }, []);
   useBgm();
   const [fontsLoaded, fontError] = useFonts({

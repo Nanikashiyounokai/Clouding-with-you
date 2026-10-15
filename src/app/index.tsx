@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
+import { AdBanner } from '../ads/AdsProvider';
 import { CloudButton, Sky } from '../components/ui';
 
 /**
@@ -33,6 +34,7 @@ export default function Home() {
           <CloudButton label="このアプリについて" align="left" onPress={() => router.push('/about')} />
         </View>
       </ScrollView>
+      <AdBanner />
     </Sky>
   );
 }

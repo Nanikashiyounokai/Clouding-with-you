@@ -7,6 +7,7 @@ import { captureRef } from 'react-native-view-shot';
 
 import { useDialog } from '../components/Dialog';
 import { PrimaryButton, SecondaryButton, Sky, T } from '../components/ui';
+import { maybeAskReview } from '../review';
 import { colors } from '../theme';
 
 /**
@@ -31,11 +32,19 @@ export default function Cloudy() {
         return;
       }
       await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: '曇天気の娘' });
+      // 共有し終えたところが、アプリが一番役に立った瞬間
+      maybeAskReview();
     } catch (e) {
       console.warn('share failed', e);
     } finally {
       setBusy(false);
     }
+  }
+
+  function close() {
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+    maybeAskReview();
   }
 
   return (
@@ -57,7 +66,7 @@ export default function Cloudy() {
 
       <View style={styles.actions}>
         <PrimaryButton label={busy ? '準備しています…' : '画像でシェアする'} onPress={share} disabled={busy} />
-        <SecondaryButton label="閉じる" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+        <SecondaryButton label="閉じる" onPress={close} />
       </View>
     </Sky>
   );

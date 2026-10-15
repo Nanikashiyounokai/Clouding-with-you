@@ -20,7 +20,8 @@
 - 天気 API は近い地点（0.1 度四方）をまとめて 1 回。呼び出しが地域数に比例する
 - 地点登録は地図＋地名検索＋現在地。緯度経度の直接入力は「詳しく」に下げた
 - 曇り通知をタップすると「今から曇るよ」シェアカード（画像で共有）
-- 広告はアプリ起動広告だけ。通知から開いたときは出さない／インストール後 3 日は出さない／1 日 2 回まで
+- 広告は画面下のバナーだけ（タイトルと登録地点）。地点を選ぶ画面とシェアカードには出さない
+- レビュー依頼は、曇りのシェアカードを閉じた／共有したときだけ。インストール後 3 日・前回から 120 日あける・生涯 3 回まで
 - 旧版の登録地点（Realm）は初回起動時に自動で取り込む（Android のみ。iOS 版は存在しなかった）
 
 ## 公開前に人がやること
@@ -32,7 +33,7 @@
 | 1 | EAS プロジェクト | **済**（@skart-inc/clouding-with-you・eas.json あり） |
 | 2 | 通知サーバー（Cloudflare Workers + D1） | **デプロイ済**（https://clouding-with-you.skart20220220.workers.dev）。**OpenWeather のキーを人が入れる**：`cd server && npx wrangler secret put OPENWEATHER_API_KEY` |
 | 3 | プッシュの認証情報 | **人**：Android は Firebase の FCM V1 サービスアカウント鍵、iOS は APNs 鍵を `npx eas-cli credentials` で登録。無いと通知が届かない |
-| 4 | AdMob（起動広告ユニット・GDPR 同意メッセージ・iOS アプリ） | **人**：アプリ ID の pub-2529… を持つ Google アカウントが Chrome のログイン中アカウントに見当たらなかった。どのアカウントか確認が要る |
+| 4 | AdMob（バナー広告ユニット・GDPR 同意メッセージ・iOS アプリ） | **人**：アプリ ID の pub-2529… を持つ Google アカウントが Chrome のログイン中アカウントに見当たらなかった。どのアカウントか確認が要る |
 | 5 | iOS の Bundle ID | **決定** `com.skart.cloudingwithyou`。App Store Connect でのアプリ作成は人 |
 | 6 | アプリアイコン 1024px | **済**（デザイン原画から切り出し） |
 | 7 | Android の署名鍵を EAS に登録 | **人**：`~/Desktop/SKart/その他/Key.jks`。旧版と同じ鍵でないとアップデートにならない |

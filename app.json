@@ -40,7 +40,8 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "com.google.android.gms.permission.AD_ID"
-      ]
+      ],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.skart.clouding_with_you"
     },
     "plugins": [
       "expo-router",
@@ -70,8 +71,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/title_white2.png",
-          "imageWidth": 220,
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 288,
           "resizeMode": "contain",
           "backgroundColor": "#3F8ACC"
         }
