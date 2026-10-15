@@ -76,6 +76,18 @@ export function afterNotify(s: NotifyState, nowMs: number, tzOffsetSec: number):
   return { lastNotifiedAt: nowMs, dayKey, dayCount: (s.dayKey === dayKey ? s.dayCount : 0) + 1 };
 }
 
+/** 「曇っている」とみなす雲量（%）。曇り判定の行き先と同じ基準 */
+export const CLOUDY_AT = CLOUD_RULE.minFutureClouds;
+
+export type AreaState = { lastClouds: number | null; lastCloudyAt: number | null };
+
+/** 地域の曇りの記録を更新する。曇っていない → 曇り に変わった時刻を残す */
+export function nextAreaState(prev: AreaState, clouds: number, nowMs: number): AreaState {
+  const wasCloudy = prev.lastClouds !== null && prev.lastClouds >= CLOUDY_AT;
+  const isCloudy = clouds >= CLOUDY_AT;
+  return { lastClouds: clouds, lastCloudyAt: isCloudy && !wasCloudy ? nowMs : prev.lastCloudyAt };
+}
+
 /**
  * 天気を問い合わせる単位。近い地点はまとめて 1 回にする（0.1 度 ≒ 11 km 四方）。
  * 呼び出し回数がユーザー数ではなく地域数に比例する。

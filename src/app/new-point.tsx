@@ -1,52 +1,49 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import MapView, { Marker, type MapPressEvent } from 'react-native-maps';
 
-import { HomeButton, PrimaryButton, SecondaryButton, Sky, Title } from '../components/ui';
+import { useDialog } from '../components/Dialog';
+import { Header, PrimaryButton, SecondaryButton, Sky, T } from '../components/ui';
 import { MAX_POINTS, round4, validate } from '../domain/points';
 import { useStore } from '../store';
-import { colors } from '../theme';
+import { colors, fonts } from '../theme';
 
 const TOKYO_STATION = { latitude: 35.6809591, longitude: 139.7673068 };
 
 const ERRORS = {
-  name: '登録名を入力してください',
-  lat: '緯度は -90 度から 90 度の範囲で入力してください',
-  lon: '経度は -180 度から 180 度の範囲で入力してください',
-  full: `登録できるのは最大 ${MAX_POINTS} 地点です。必要のない登録地点を削除してください`,
+  name: { title: '登録名を入れてください', message: '自宅、新宿など\nわかりやすい名前を付けてください。' },
+  lat: { title: '地点を選んでください', message: '地名で探すか、\n地図をタップして選んでください。' },
+  lon: { title: '地点を選んでください', message: '地名で探すか、\n地図をタップして選んでください。' },
+  full: { title: `登録できるのは${MAX_POINTS}地点までです`, message: '使わなくなった地点を\n「登録地点」から削除してください。' },
 } as const;
 
 /**
- * 新規地点登録。
- * 旧版は緯度経度の手入力が主で、地図は別画面・初期位置は東京駅固定・地名検索なし だった。
- * 新版は地図を主にし、地名検索と現在地を地図の上に置く。緯度経度の直接入力は「詳しく」に下げた。
+ * 新規地点登録。地名で探すか、地図をタップするか、現在地で選ぶ。
+ * 旧版にあった緯度経度の直接入力はなくした（2026-10-15）。
  */
 export default function NewPoint() {
   const { points, active, add } = useStore();
+  const dialog = useDialog();
   const map = useRef<MapView>(null);
   const [name, setName] = useState('');
   const [query, setQuery] = useState('');
   const [coord, setCoord] = useState<{ latitude: number; longitude: number } | null>(null);
   const [busy, setBusy] = useState<null | 'search' | 'here'>(null);
-  const [manual, setManual] = useState(false);
-  const [latText, setLatText] = useState('');
-  const [lonText, setLonText] = useState('');
 
   const start = active ? { latitude: active.lat, longitude: active.lon } : TOKYO_STATION;
 
   function place(latitude: number, longitude: number, zoom = true) {
     const c = { latitude: round4(latitude), longitude: round4(longitude) };
     setCoord(c);
-    setLatText(String(c.latitude));
-    setLonText(String(c.longitude));
     if (zoom) map.current?.animateToRegion({ ...c, latitudeDelta: 0.08, longitudeDelta: 0.08 }, 400);
   }
 
   async function ensureLocationPermission(): Promise<boolean> {
     const p = await Location.requestForegroundPermissionsAsync();
-    if (!p.granted) Alert.alert('位置情報が使えません', '設定アプリで位置情報の利用を許可してください');
+    if (!p.granted) dialog.show({ title: '位置情報が使えません', message: '設定アプリで\n位置情報の利用を許可してください。' });
     return p.granted;
   }
 
@@ -60,13 +57,13 @@ export default function NewPoint() {
       if (Platform.OS === 'android' && !(await ensureLocationPermission())) return;
       const hits = await Location.geocodeAsync(q);
       if (!hits.length) {
-        Alert.alert('見つかりませんでした', '別の言い方で検索するか、地図をタップして選んでください');
+        dialog.show({ title: '見つかりませんでした', message: '別の言い方で探すか、\n地図をタップして選んでください。' });
         return;
       }
       place(hits[0].latitude, hits[0].longitude);
       if (!name.trim()) setName(q);
     } catch {
-      Alert.alert('検索できませんでした', '通信状態を確認して、もう一度お試しください');
+      dialog.show({ title: '探せませんでした', message: '通信できる状態で\nもう一度お試しください。' });
     } finally {
       setBusy(null);
     }
@@ -87,7 +84,7 @@ export default function NewPoint() {
         if (label) setName(label);
       }
     } catch {
-      Alert.alert('現在地を取得できませんでした', '位置情報をオンにしてしばらく待ってから、もう一度お試しください');
+      dialog.show({ title: '現在地がわかりませんでした', message: '位置情報をオンにして\nしばらく待ってからお試しください。' });
     } finally {
       setBusy(null);
     }
@@ -99,85 +96,72 @@ export default function NewPoint() {
   }
 
   function save() {
-    const lat = manual ? latText : coord?.latitude ?? '';
-    const lon = manual ? lonText : coord?.longitude ?? '';
-    if (!manual && !coord) {
-      Alert.alert('地点を選んでください', '地名で検索するか、地図をタップしてください');
-      return;
-    }
-    const err = validate({ name, lat, lon }, points.length);
+    const err = validate({ name, lat: coord?.latitude ?? '', lon: coord?.longitude ?? '' }, points.length);
     if (err) {
-      Alert.alert('登録できません', ERRORS[err]);
+      dialog.show(ERRORS[err]);
       return;
     }
+    if (!coord) return;
     const first = points.length === 0;
-    add({ name, lat: Number(lat), lon: Number(lon) });
-    Alert.alert(
-      '地点を登録しました',
-      first ? `「${name.trim()}」で祈願を始めました。曇りそうなときにお知らせします` : '「登録地点」で祈願中にすると、曇りそうなときにお知らせします',
-      [
-        { text: 'タイトルに戻る', onPress: () => router.dismissTo('/') },
-        { text: '登録地点を見る', onPress: () => router.replace('/points') },
+    add({ name, lat: coord.latitude, lon: coord.longitude });
+    dialog.show({
+      title: '地点を登録しました',
+      message: first ? `「${name.trim()}」で祈願を始めました。\n曇りそうなときにお知らせします。` : '「登録地点」で祈願すると、\n曇りそうなときにお知らせします。',
+      buttons: [
+        { label: '登録地点を見る', kind: 'primary', onPress: () => router.replace('/points') },
+        { label: 'タイトルに戻る', kind: 'secondary', onPress: () => router.dismissTo('/') },
       ],
-    );
+    });
   }
 
   return (
     <Sky>
+      <Header title="新規地点登録" />
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
-          <View style={styles.header}>
-            <Title>新規地点登録</Title>
-            <View style={styles.homeSlot}>
-              <HomeButton />
-            </View>
-          </View>
+          <T bold style={styles.label}>
+            登録名
+          </T>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="例　自宅、新宿"
+            placeholderTextColor={colors.inkSoft}
+            style={styles.input}
+            maxLength={30}
+            returnKeyType="done"
+          />
 
-          <Text style={styles.label}>登録名</Text>
-          <TextInput value={name} onChangeText={setName} placeholder="例：自宅、新宿" placeholderTextColor={colors.inkSoft} style={styles.input} maxLength={30} returnKeyType="done" />
-
-          <Text style={styles.label}>場所</Text>
-          <View style={styles.row}>
+          <T bold style={styles.label}>
+            場所
+          </T>
+          <View style={styles.searchRow}>
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="地名や住所で検索"
+              placeholder="地名や住所で探す"
               placeholderTextColor={colors.inkSoft}
               style={[styles.input, styles.grow]}
               returnKeyType="search"
               onSubmitEditing={search}
             />
-            <Pressable accessibilityRole="button" onPress={search} style={styles.iconButton} disabled={busy !== null}>
-              {busy === 'search' ? <ActivityIndicator color={colors.ink} /> : <Text style={styles.iconText}>検索</Text>}
+            <Pressable accessibilityRole="button" accessibilityLabel="探す" onPress={search} style={styles.iconButton} disabled={busy !== null}>
+              {busy === 'search' ? <ActivityIndicator color={colors.blueDeep} /> : <Ionicons name="search" size={20} color={colors.blueDeep} />}
             </Pressable>
           </View>
 
           <View style={styles.mapWrap}>
-            <MapView
-              ref={map}
-              style={styles.map}
-              initialRegion={{ ...start, latitudeDelta: 0.3, longitudeDelta: 0.3 }}
-              onPress={onMapPress}
-              showsUserLocation={false}
-              toolbarEnabled={false}
-            >
-              {coord && <Marker coordinate={coord} />}
+            <MapView ref={map} style={styles.map} initialRegion={{ ...start, latitudeDelta: 0.3, longitudeDelta: 0.3 }} onPress={onMapPress} toolbarEnabled={false}>
+              {coord && <Marker coordinate={coord} pinColor={colors.blue} />}
             </MapView>
             <Pressable accessibilityRole="button" onPress={here} style={styles.hereButton} disabled={busy !== null}>
-              {busy === 'here' ? <ActivityIndicator color={colors.ink} /> : <Text style={styles.iconText}>現在地</Text>}
+              {busy === 'here' ? <ActivityIndicator color={colors.blueDeep} /> : <Ionicons name="locate" size={16} color={colors.blueDeep} />}
+              <T bold style={styles.hereText}>
+                現在地
+              </T>
             </Pressable>
           </View>
-          <Text style={styles.hint}>{coord ? `緯度 ${coord.latitude}　経度 ${coord.longitude}` : '地図をタップしても選べます'}</Text>
-
-          <Pressable onPress={() => setManual((v) => !v)} accessibilityRole="button">
-            <Text style={styles.link}>{manual ? '▲ 緯度・経度の直接入力を閉じる' : '▼ 緯度・経度を直接入力する'}</Text>
-          </Pressable>
-          {manual && (
-            <View style={styles.row}>
-              <TextInput value={latText} onChangeText={setLatText} placeholder="緯度" placeholderTextColor={colors.inkSoft} style={[styles.input, styles.grow]} keyboardType="numbers-and-punctuation" />
-              <TextInput value={lonText} onChangeText={setLonText} placeholder="経度" placeholderTextColor={colors.inkSoft} style={[styles.input, styles.grow]} keyboardType="numbers-and-punctuation" />
-            </View>
-          )}
+          <T style={styles.hint}>地図をタップしても選べます</T>
 
           <View style={styles.actions}>
             <PrimaryButton label="この地点を登録する" onPress={save} />
@@ -191,19 +175,35 @@ export default function NewPoint() {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  body: { paddingHorizontal: 16, paddingBottom: 32, gap: 8 },
-  header: { justifyContent: 'center' },
-  homeSlot: { position: 'absolute', right: 0 },
-  label: { color: colors.text, fontWeight: 'bold', marginTop: 8 },
-  input: { backgroundColor: colors.card, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: colors.ink },
-  row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  body: { paddingHorizontal: 20, paddingBottom: 32, gap: 8 },
+  label: { fontSize: 15, lineHeight: 23, marginTop: 8 },
+  input: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: colors.ink,
+    fontFamily: fonts.regular,
+  },
+  searchRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   grow: { flex: 1 },
-  iconButton: { backgroundColor: colors.card, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 11, minWidth: 64, alignItems: 'center' },
-  iconText: { color: colors.ink, fontWeight: 'bold' },
-  mapWrap: { height: 300, borderRadius: 10, overflow: 'hidden', marginTop: 4 },
+  iconButton: { backgroundColor: colors.card, borderRadius: 14, width: 52, height: 50, alignItems: 'center', justifyContent: 'center' },
+  mapWrap: { height: 300, borderRadius: 18, overflow: 'hidden', marginTop: 4 },
   map: { flex: 1 },
-  hereButton: { position: 'absolute', right: 10, bottom: 10, backgroundColor: colors.card, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 },
-  hint: { color: colors.textSoft, fontSize: 13 },
-  link: { color: colors.text, fontSize: 13, textDecorationLine: 'underline', marginTop: 4 },
-  actions: { gap: 10, marginTop: 16 },
+  hereButton: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  hereText: { color: colors.blueDeep, fontSize: 14, lineHeight: 20 },
+  hint: { color: colors.whiteSoft, fontSize: 13, lineHeight: 20, textAlign: 'center' },
+  actions: { gap: 12, marginTop: 20 },
 });

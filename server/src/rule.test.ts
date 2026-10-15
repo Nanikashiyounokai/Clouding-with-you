@@ -1,4 +1,4 @@
-import { afterNotify, areaKey, canNotify, judge, localClock, type Weather } from './rule';
+import { afterNotify, areaKey, canNotify, judge, localClock, nextAreaState, type Weather } from './rule';
 
 const T0 = 1_791_900_000; // 秒
 
@@ -59,4 +59,22 @@ describe('通知の上限', () => {
 it('近い地点は同じ問い合わせにまとめる', () => {
   expect(areaKey(35.6809, 139.7673)).toBe(areaKey(35.7012, 139.7712));
   expect(areaKey(35.6809, 139.7673)).not.toBe(areaKey(34.6937, 135.5023));
+});
+
+describe('最後に曇った時刻', () => {
+  it('曇っていない → 曇り に変わった時刻だけ残す', () => {
+    let s = nextAreaState({ lastClouds: null, lastCloudyAt: null }, 30, 1);
+    expect(s.lastCloudyAt).toBeNull();
+    s = nextAreaState(s, 80, 2);
+    expect(s.lastCloudyAt).toBe(2);
+    s = nextAreaState(s, 90, 3); // 曇りが続いている
+    expect(s.lastCloudyAt).toBe(2);
+    s = nextAreaState(s, 20, 4);
+    expect(s.lastCloudyAt).toBe(2);
+    s = nextAreaState(s, 75, 5);
+    expect(s.lastCloudyAt).toBe(5);
+  });
+  it('初めて見たときにすでに曇っていれば、その時刻を残す', () => {
+    expect(nextAreaState({ lastClouds: null, lastCloudyAt: null }, 85, 9).lastCloudyAt).toBe(9);
+  });
 });

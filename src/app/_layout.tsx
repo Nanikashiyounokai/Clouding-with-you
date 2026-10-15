@@ -1,14 +1,20 @@
+import { ShipporiMincho_400Regular, ShipporiMincho_700Bold, useFonts } from '@expo-google-fonts/shippori-mincho';
 import { useAudioPlayer } from 'expo-audio';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AdsProvider } from '../ads/AdsProvider';
+import { DialogProvider } from '../components/Dialog';
 import { setupNotifications } from '../push';
 import { StoreProvider } from '../store';
-import { colors } from '../theme';
+import { colors, fonts } from '../theme';
+
+// 明朝の書体を読み込むまでスプラッシュを出しておく（読み込み前に描くと一瞬ゴシックになる）
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 /**
  * BGM（平山の自作曲）。旧版はタイトル画面の onCreate で鳴らし、
@@ -34,11 +40,21 @@ export default function RootLayout() {
     setupNotifications().catch((e) => console.warn('notification setup failed', e));
   }, []);
   useBgm();
+  const [fontsLoaded, fontError] = useFonts({
+    [fonts.regular]: ShipporiMincho_400Regular,
+    [fonts.bold]: ShipporiMincho_700Bold,
+  });
+  const ready = fontsLoaded || !!fontError;
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
+  if (!ready) return null;
 
   return (
     <SafeAreaProvider>
       <StoreProvider>
         <AdsProvider>
+          <DialogProvider>
           <StatusBar style="light" />
           <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: colors.skyTop } }}>
             <Stack.Screen name="index" />
@@ -47,6 +63,7 @@ export default function RootLayout() {
             <Stack.Screen name="about" />
             <Stack.Screen name="cloudy" options={{ presentation: 'modal' }} />
           </Stack>
+          </DialogProvider>
         </AdsProvider>
       </StoreProvider>
     </SafeAreaProvider>

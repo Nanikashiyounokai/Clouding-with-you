@@ -1,10 +1,16 @@
 import * as WebBrowser from 'expo-web-browser';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { HomeButton, Sky, Title } from '../components/ui';
+import { Header, Sky, T } from '../components/ui';
 import { colors } from '../theme';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
+
+const STEPS = [
+  '新規地点登録の画面で、\n地点を選んで登録します。',
+  '登録地点の画面で、\n祈願する地点の変更や削除ができます。',
+  '祈願中の地点が曇りそうなとき、\nお知らせします。',
+];
 
 /**
  * このアプリについて。旧版の「使い方」をそのまま載せる。
@@ -14,25 +20,32 @@ const SKART_URL = 'https://skart-inc.jimdofree.com/';
 export default function About() {
   return (
     <Sky>
+      <Header title="このアプリについて" />
       <ScrollView contentContainerStyle={styles.body}>
-        <View style={styles.header}>
-          <Title>曇天気の娘</Title>
-          <View style={styles.homeSlot}>
-            <HomeButton />
-          </View>
-        </View>
-        <Text style={styles.quote}>「ねぇ、今から曇るよ」</Text>
-        <Text style={styles.lead}>
-          このアプリは登録地点が{'\n'}曇りそうなとき ”だけ” 通知します。
-        </Text>
+        <Image source={require('../../assets/images/title_white2.png')} style={styles.title} resizeMode="contain" accessibilityLabel="曇天気の娘" />
+        <T bold style={styles.quote}>
+          「ねぇ、今から曇るよ」
+        </T>
+        <T style={styles.lead}>{'このアプリは、登録した地点が\n曇りそうなとき“だけ”お知らせします。'}</T>
 
-        <Text style={styles.h}>使い方</Text>
-        <Step n="1" text={'新規地点登録画面から\n地点を選んで登録してください'} />
-        <Step n="2" text={'登録地点の画面で\n観測する地点（祈願中）の変更・削除ができます'} />
-        <Step n="3" text={'祈願中の地点が曇りそうなとき、通知します'} />
+        <View style={styles.card}>
+          <T bold style={styles.h}>
+            使い方
+          </T>
+          {STEPS.map((s, i) => (
+            <View key={i} style={styles.step}>
+              <View style={styles.num}>
+                <T bold style={styles.numText}>
+                  {i + 1}
+                </T>
+              </View>
+              <T style={styles.stepText}>{s}</T>
+            </View>
+          ))}
+        </View>
 
         <Pressable onPress={() => WebBrowser.openBrowserAsync(SKART_URL).catch(() => {})} accessibilityRole="link" style={styles.logoWrap}>
-          <Text style={styles.made}>made by</Text>
+          <T style={styles.made}>made by</T>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" accessibilityLabel="SKart" />
         </Pressable>
       </ScrollView>
@@ -40,26 +53,18 @@ export default function About() {
   );
 }
 
-function Step({ n, text }: { n: string; text: string }) {
-  return (
-    <View style={styles.step}>
-      <Text style={styles.n}>{n}</Text>
-      <Text style={styles.stepText}>{text}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  body: { paddingHorizontal: 16, paddingBottom: 32, alignItems: 'center', gap: 8 },
-  header: { alignSelf: 'stretch', justifyContent: 'center' },
-  homeSlot: { position: 'absolute', right: 0 },
-  quote: { color: colors.text, fontSize: 18, fontWeight: 'bold', marginTop: 8 },
-  lead: { color: colors.text, fontSize: 15, textAlign: 'center', lineHeight: 24, marginTop: 8 },
-  h: { color: colors.text, fontSize: 18, fontWeight: 'bold', marginTop: 24 },
-  step: { alignItems: 'center', marginTop: 12 },
-  n: { color: colors.text, fontWeight: 'bold', fontSize: 16 },
-  stepText: { color: colors.text, textAlign: 'center', lineHeight: 22 },
+  body: { paddingHorizontal: 20, paddingBottom: 32, alignItems: 'center' },
+  title: { width: '70%', maxWidth: 300, aspectRatio: 320 / 123 },
+  quote: { fontSize: 19, lineHeight: 30 },
+  lead: { fontSize: 15, lineHeight: 26, textAlign: 'center', marginTop: 12 },
+  card: { alignSelf: 'stretch', backgroundColor: colors.card, borderRadius: 20, padding: 20, marginTop: 28, gap: 14 },
+  h: { color: colors.blueDeep, fontSize: 17, lineHeight: 26, textAlign: 'center' },
+  step: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  num: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.blue, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  numText: { fontSize: 14, lineHeight: 20 },
+  stepText: { flex: 1, color: colors.ink, fontSize: 14, lineHeight: 23 },
   logoWrap: { alignItems: 'center', marginTop: 40 },
-  made: { color: colors.inkSoft, fontSize: 11 },
+  made: { color: colors.ink, fontSize: 11, lineHeight: 16 },
   logo: { width: 120, height: 38 },
 });

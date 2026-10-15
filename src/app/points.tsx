@@ -1,51 +1,60 @@
 import { router } from 'expo-router';
-import { Alert, FlatList, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 
-import { HomeButton, PrimaryButton, Sky, Title } from '../components/ui';
+import { useDialog } from '../components/Dialog';
+import { Header, PrimaryButton, Sky, T } from '../components/ui';
 import type { Point } from '../domain/points';
+import { describeCloud, useLastCloudy } from '../lastCloudy';
 import { useStore, type NotifyStatus } from '../store';
 import { colors } from '../theme';
 
 /** 通知が届かない理由。祈願中の地点があるときだけ出す */
 const NOTICE: Partial<Record<NotifyStatus, { text: string; settings?: boolean }>> = {
-  denied: { text: '通知が許可されていないため、曇りのお知らせが届きません。', settings: true },
-  offline: { text: 'お知らせの登録ができませんでした。通信できる状態でアプリを開き直してください。' },
-  failed: { text: 'お知らせの登録ができませんでした。時間をおいてアプリを開き直してください。' },
+  denied: { text: '通知が許可されていないため、\n曇りのお知らせが届きません。', settings: true },
+  offline: { text: 'お知らせの登録ができませんでした。\n通信できる状態で開き直してください。' },
+  failed: { text: 'お知らせの登録ができませんでした。\n時間をおいて開き直してください。' },
 };
 
 export default function Points() {
   const { points, active, notify, toggle, remove } = useStore();
+  const dialog = useDialog();
+  const clouds = useLastCloudy(points);
   const notice = active ? NOTICE[notify] : undefined;
 
   function openDetail(p: Point) {
-    Alert.alert(`「${p.name}」`, `緯度 ${p.lat}　経度 ${p.lon}`, [
-      { text: '削除', style: 'destructive', onPress: () => confirmRemove(p) },
-      { text: '戻る', style: 'cancel' },
-    ]);
+    dialog.show({
+      title: `「${p.name}」`,
+      message: describeCloud(clouds[p.id]),
+      buttons: [
+        { label: '戻る', kind: 'primary' },
+        { label: 'この地点を削除する', kind: 'danger', onPress: () => confirmRemove(p) },
+      ],
+    });
   }
 
   function confirmRemove(p: Point) {
-    Alert.alert('削除しますか', `「${p.name}」を登録地点から削除します`, [
-      { text: 'やめる', style: 'cancel' },
-      { text: '削除する', style: 'destructive', onPress: () => remove(p.id) },
-    ]);
+    dialog.show({
+      title: '削除しますか',
+      message: `「${p.name}」を\n登録地点から削除します。`,
+      buttons: [
+        { label: 'やめる', kind: 'primary' },
+        { label: '削除する', kind: 'danger', onPress: () => remove(p.id) },
+      ],
+    });
   }
 
   return (
     <Sky>
-      <View style={styles.header}>
-        <Title>登録地点</Title>
-        <View style={styles.homeSlot}>
-          <HomeButton />
-        </View>
-      </View>
+      <Header title="登録地点" />
 
       {notice && (
         <Pressable onPress={notice.settings ? () => Linking.openSettings() : undefined} style={styles.notice} accessibilityRole={notice.settings ? 'button' : undefined}>
-          <Text style={styles.noticeText}>
-            {notice.text}
-            {notice.settings ? '（タップで設定を開く）' : ''}
-          </Text>
+          <T style={styles.noticeText}>{notice.text}</T>
+          {notice.settings && (
+            <T bold style={styles.noticeLink}>
+              設定を開く
+            </T>
+          )}
         </Pressable>
       )}
 
@@ -53,26 +62,35 @@ export default function Points() {
         data={points}
         keyExtractor={(p) => p.id}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={<Text style={styles.empty}>登録地点がありません</Text>}
-        ListHeaderComponent={points.length ? <Text style={styles.help}>祈願中の地点が曇りそうなとき、お知らせします。○ を押して切り替えます。</Text> : null}
+        ListEmptyComponent={
+          <T style={styles.empty}>
+            {'登録地点がありません。\n新規地点登録から追加してください。'}
+          </T>
+        }
+        ListHeaderComponent={
+          points.length ? (
+            <T style={styles.help}>{'祈願する地点を一つ選ぶと、\n曇りそうなときにお知らせします。'}</T>
+          ) : null
+        }
         renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => openDetail(item)} accessibilityRole="button" accessibilityHint="詳細と削除">
+          <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.8 }]} onPress={() => openDetail(item)} accessibilityRole="button" accessibilityHint="詳細と削除">
             <View style={styles.grow}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.coord}>
-                緯度 {item.lat}　経度 {item.lon}
-              </Text>
+              <T bold style={styles.name} numberOfLines={1}>
+                {item.name}
+              </T>
+              <T style={styles.cloud}>{describeCloud(clouds[item.id])}</T>
             </View>
             <Pressable
               onPress={() => toggle(item.id)}
-              hitSlop={10}
-              accessibilityRole="radio"
+              hitSlop={8}
+              accessibilityRole="switch"
               accessibilityState={{ checked: item.active }}
               accessibilityLabel={`${item.name}で祈願する`}
-              style={styles.radioWrap}
+              style={[styles.pray, item.active && styles.prayOn]}
             >
-              {item.active && <Text style={styles.praying}>祈願中</Text>}
-              <View style={[styles.radio, item.active && styles.radioOn]}>{item.active && <View style={styles.dot} />}</View>
+              <T bold style={[styles.prayText, item.active && styles.prayTextOn]}>
+                {item.active ? '祈願中' : '祈願する'}
+              </T>
             </Pressable>
           </Pressable>
         )}
@@ -86,21 +104,19 @@ export default function Points() {
 }
 
 const styles = StyleSheet.create({
-  header: { justifyContent: 'center', paddingHorizontal: 16 },
-  homeSlot: { position: 'absolute', right: 16 },
-  notice: { marginHorizontal: 16, marginBottom: 8, backgroundColor: '#FFF4E5', borderRadius: 8, padding: 12 },
-  noticeText: { color: '#7A4A00', fontSize: 13 },
-  list: { paddingHorizontal: 16, paddingBottom: 16, gap: 10 },
-  help: { color: colors.textSoft, fontSize: 13, marginBottom: 4 },
-  empty: { color: colors.text, textAlign: 'center', marginTop: 48, fontSize: 16 },
-  card: { backgroundColor: colors.card, borderRadius: 10, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  notice: { marginHorizontal: 20, marginBottom: 8, backgroundColor: colors.card, borderRadius: 14, padding: 14, alignItems: 'center' },
+  noticeText: { color: colors.ink, fontSize: 13, lineHeight: 21, textAlign: 'center' },
+  noticeLink: { color: colors.blueDeep, fontSize: 13, lineHeight: 21, marginTop: 4, textDecorationLine: 'underline' },
+  list: { paddingHorizontal: 20, paddingBottom: 16, gap: 12, flexGrow: 1 },
+  help: { color: colors.whiteSoft, fontSize: 14, lineHeight: 23, textAlign: 'center', marginBottom: 4 },
+  empty: { textAlign: 'center', marginTop: 64, fontSize: 16, lineHeight: 28 },
+  card: { backgroundColor: colors.card, borderRadius: 18, paddingVertical: 16, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', gap: 12 },
   grow: { flex: 1 },
-  name: { color: colors.ink, fontSize: 17, fontWeight: 'bold' },
-  coord: { color: colors.inkSoft, fontSize: 13, marginTop: 2 },
-  radioWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  praying: { color: colors.accent, fontWeight: 'bold', fontSize: 13 },
-  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: colors.inkSoft, alignItems: 'center', justifyContent: 'center' },
-  radioOn: { borderColor: colors.accent },
-  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: colors.accent },
-  footer: { paddingHorizontal: 16, paddingBottom: 12 },
+  name: { color: colors.ink, fontSize: 18, lineHeight: 27 },
+  cloud: { color: colors.inkSoft, fontSize: 13, lineHeight: 21, marginTop: 2 },
+  pray: { borderRadius: 18, borderWidth: 1, borderColor: colors.blue, paddingHorizontal: 14, paddingVertical: 6 },
+  prayOn: { backgroundColor: colors.blue },
+  prayText: { color: colors.blueDeep, fontSize: 13, lineHeight: 20 },
+  prayTextOn: { color: colors.white },
+  footer: { paddingHorizontal: 20, paddingBottom: 12, paddingTop: 4 },
 });
