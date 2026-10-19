@@ -3,15 +3,16 @@ import { useAudioPlayer } from 'expo-audio';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AdsProvider } from '../ads/AdsProvider';
+import { Consent } from '../components/Consent';
 import { DialogProvider } from '../components/Dialog';
 import { setupNotifications } from '../push';
 import { recordFirstLaunch } from '../review';
-import { StoreProvider } from '../store';
+import { StoreProvider, useStore } from '../store';
 import { colors, fonts } from '../theme';
 
 // 明朝の書体を読み込むまでスプラッシュを出しておく（読み込み前に描くと一瞬ゴシックになる）
@@ -36,6 +37,14 @@ function useBgm() {
   }, [player]);
 }
 
+/** 初回の説明に同意するまでは、ほかの画面を出さない */
+function ConsentGate({ children }: { children: ReactNode }) {
+  const { loaded, consented, acceptConsent } = useStore();
+  if (!loaded) return null;
+  if (!consented) return <Consent onAccept={acceptConsent} />;
+  return <>{children}</>;
+}
+
 export default function RootLayout() {
   useEffect(() => {
     setupNotifications().catch((e) => console.warn('notification setup failed', e));
@@ -58,6 +67,7 @@ export default function RootLayout() {
         <AdsProvider>
           <DialogProvider>
           <StatusBar style="light" />
+          <ConsentGate>
           <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: colors.skyTop } }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="new-point" />
@@ -65,6 +75,7 @@ export default function RootLayout() {
             <Stack.Screen name="about" />
             <Stack.Screen name="cloudy" options={{ presentation: 'modal' }} />
           </Stack>
+          </ConsentGate>
           </DialogProvider>
         </AdsProvider>
       </StoreProvider>

@@ -8,7 +8,8 @@ main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
 [triggers]
-crons = ["*/10 * * * *"]
+# 2026-10-19 停止：アプリがスマホから直接 MET Norway の予報を取る形に変えた
+crons = []
 
 [[d1_databases]]
 binding = "DB"

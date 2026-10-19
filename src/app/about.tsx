@@ -6,6 +6,8 @@ import { openStorePage } from '../review';
 import { colors } from '../theme';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
+/** 天気データの出典。CC BY 4.0 で、アプリ内に表示する決まり */
+const METNO_LICENSE_URL = 'https://api.met.no/doc/License';
 
 const STEPS = [
   '新規地点登録の画面で、\n地点を選んで登録します。',
@@ -50,6 +52,10 @@ export default function About() {
           <PrimaryButton label="このアプリを評価する" onPress={() => openStorePage().catch(() => {})} />
         </View>
 
+        <Pressable onPress={() => WebBrowser.openBrowserAsync(METNO_LICENSE_URL).catch(() => {})} accessibilityRole="link" style={styles.credit}>
+          <T style={styles.creditText}>{'天気データ：ノルウェー気象局（MET Norway）\nCC BY 4.0'}</T>
+        </Pressable>
+
         <Pressable onPress={() => WebBrowser.openBrowserAsync(SKART_URL).catch(() => {})} accessibilityRole="link" style={styles.logoWrap}>
           <T style={styles.made}>made by</T>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" accessibilityLabel="SKart" />
@@ -73,7 +79,9 @@ const styles = StyleSheet.create({
   stepText: { flex: 1, color: colors.ink, fontSize: 14, lineHeight: 23 },
   rate: { alignSelf: 'stretch', marginTop: 28, gap: 12 },
   rateLead: { fontSize: 14, lineHeight: 23, textAlign: 'center' },
-  logoWrap: { alignItems: 'center', marginTop: 40, marginBottom: 16 },
+  credit: { marginTop: 32 },
+  creditText: { fontSize: 12, lineHeight: 20, textAlign: 'center', color: colors.whiteSoft },
+  logoWrap: { alignItems: 'center', marginTop: 24, marginBottom: 16 },
   made: { color: colors.ink, fontSize: 11, lineHeight: 16 },
   logo: { width: 120, height: 38 },
 });

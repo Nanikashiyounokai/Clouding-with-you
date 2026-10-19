@@ -5,27 +5,35 @@ import { AdBanner } from '../ads/AdsProvider';
 import { useDialog } from '../components/Dialog';
 import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
 import type { Point } from '../domain/points';
-import { describeCloud, useLastCloudy } from '../lastCloudy';
 import { useStore, type NotifyStatus } from '../store';
 import { colors } from '../theme';
 
 /** 通知が届かない理由。祈願中の地点があるときだけ出す */
 const NOTICE: Partial<Record<NotifyStatus, { text: string; settings?: boolean }>> = {
   denied: { text: '通知が許可されていないため、\n曇りのお知らせが届きません。', settings: true },
-  offline: { text: 'お知らせの登録ができませんでした。\n通信できる状態で開き直してください。' },
-  failed: { text: 'お知らせの登録ができませんでした。\n時間をおいて開き直してください。' },
+  offline: { text: '天気予報を受け取れませんでした。\n通信できる状態で開き直してください。' },
 };
 
+/** 祈願中の地点で次に曇りそうな時刻 */
+function describeNext(at: number | null, now = new Date()): string {
+  if (at === null) return 'しばらく曇りの予報はありません';
+  const d = new Date(at);
+  const p = (n: number) => String(n).padStart(2, '0');
+  const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(d) - day(now)) / 86_400_000);
+  const when = diff === 0 ? '今日' : diff === 1 ? '明日' : `${d.getMonth() + 1}月${d.getDate()}日`;
+  return `次に曇りそうなのは ${when} ${p(d.getHours())}:${p(d.getMinutes())}ごろ`;
+}
+
 export default function Points() {
-  const { points, active, notify, toggle, remove } = useStore();
+  const { points, active, notify, nextCloud, toggle, remove } = useStore();
   const dialog = useDialog();
-  const clouds = useLastCloudy(points);
   const notice = active ? NOTICE[notify] : undefined;
 
   function openDetail(p: Point) {
     dialog.show({
       title: `「${p.name}」`,
-      message: describeCloud(clouds[p.id]),
+      message: p.active ? describeNext(nextCloud) : '祈願すると、\n曇りそうなときにお知らせします。',
       buttons: [
         { label: '戻る', kind: 'primary' },
         { label: 'この地点を削除する', kind: 'danger', onPress: () => confirmRemove(p) },
@@ -79,7 +87,7 @@ export default function Points() {
               <T bold style={styles.name} numberOfLines={1}>
                 {item.name}
               </T>
-              <T style={styles.cloud}>{describeCloud(clouds[item.id])}</T>
+              {item.active && <T style={styles.cloud}>{describeNext(nextCloud)}</T>}
             </View>
             <Pressable
               onPress={() => toggle(item.id)}

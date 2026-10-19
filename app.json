@@ -52,6 +52,7 @@
         }
       ],
       "expo-sharing",
+      "expo-background-task",
       [
         "expo-notifications",
         {
@@ -108,7 +109,6 @@
       "expo-asset"
     ],
     "extra": {
-      "apiBaseUrl": "https://clouding-with-you.skart20220220.workers.dev",
       "router": {},
       "eas": {
         "projectId": "4a14eca1-3a98-4c61-81c5-495f7fcc21ee"
