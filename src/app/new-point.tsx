@@ -9,6 +9,7 @@ import { useDialog } from '../components/Dialog';
 import { BackToTitle, Header, PrimaryButton, SecondaryButton, Sky, T } from '../components/ui';
 import { MAX_POINTS, round4, validate } from '../domain/points';
 import { useStore } from '../store';
+import { pinWidget } from '../widget';
 import { colors, fonts } from '../theme';
 
 const TOKYO_STATION = { latitude: 35.6809591, longitude: 139.7673068 };
@@ -104,12 +105,27 @@ export default function NewPoint() {
     if (!coord) return;
     const first = points.length === 0;
     add({ name, lat: coord.latitude, lon: coord.longitude });
+    const toPoints = () => router.replace('/points');
+    const toTitle = () => router.dismissTo('/');
+    // 最初の地点を登録した直後が一番関心が高いので、ここでウィジェットを勧める（Android はボタン 1 つで置ける）
+    if (first && Platform.OS === 'android') {
+      dialog.show({
+        title: '地点を登録しました',
+        message: `「${name.trim()}」で祈願を始めました。\nホーム画面に置くと、\n次に曇る時刻がいつでも見られます。`,
+        buttons: [
+          { label: 'ホーム画面に置く', kind: 'primary', onPress: () => pinWidget().finally(toPoints) },
+          { label: '登録地点を見る', kind: 'secondary', onPress: toPoints },
+          { label: 'タイトルに戻る', kind: 'secondary', onPress: toTitle },
+        ],
+      });
+      return;
+    }
     dialog.show({
       title: '地点を登録しました',
       message: first ? `「${name.trim()}」で祈願を始めました。\n曇りそうなときにお知らせします。` : '「登録地点」で祈願すると、\n曇りそうなときにお知らせします。',
       buttons: [
-        { label: '登録地点を見る', kind: 'primary', onPress: () => router.replace('/points') },
-        { label: 'タイトルに戻る', kind: 'secondary', onPress: () => router.dismissTo('/') },
+        { label: '登録地点を見る', kind: 'primary', onPress: toPoints },
+        { label: 'タイトルに戻る', kind: 'secondary', onPress: toTitle },
       ],
     });
   }

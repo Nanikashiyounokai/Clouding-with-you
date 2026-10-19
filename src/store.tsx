@@ -7,6 +7,7 @@ import { refreshClouds, type CloudStatus } from './clouds';
 import { activePoint, addPoint, removePoint, toggleActive, type Point, type PointInput } from './domain/points';
 import { importLegacyPoints } from './migration/legacy';
 import { KEYS } from './storageKeys';
+import { updateWidget } from './widget';
 
 /** idle: まだ確認していない／ok: 予報が取れて予約できた／offline: 予報が取れなかった／denied: 通知が許可されていない */
 export type NotifyStatus = 'idle' | Exclude<CloudStatus, 'none' | 'no-consent'>;
@@ -76,6 +77,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (r.status === 'no-consent') return;
     setNotify(r.status === 'none' ? 'idle' : r.status);
     setNextCloud(r.nextOnset);
+    updateWidget().catch(() => {});
   }, []);
 
   const syncKey = active ? `${active.name}|${active.lat}|${active.lon}` : '';

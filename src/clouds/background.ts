@@ -1,6 +1,7 @@
 import * as BackgroundTask from 'expo-background-task';
 import * as TaskManager from 'expo-task-manager';
 
+import { updateWidget } from '../widget';
 import { refreshClouds } from './index';
 
 /**
@@ -13,6 +14,7 @@ export const CLOUD_TASK = 'clouding-refresh';
 TaskManager.defineTask(CLOUD_TASK, async () => {
   try {
     await refreshClouds({ askPermission: false });
+    await updateWidget();
     return BackgroundTask.BackgroundTaskResult.Success;
   } catch (e) {
     console.warn('background refresh failed', e);

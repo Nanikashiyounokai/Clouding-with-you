@@ -1,9 +1,10 @@
 import * as WebBrowser from 'expo-web-browser';
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
 import { openStorePage } from '../review';
 import { colors } from '../theme';
+import { pinWidget } from '../widget';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
 /** 天気データの出典。CC BY 4.0 で、アプリ内に表示する決まり */
@@ -46,6 +47,13 @@ export default function About() {
             </View>
           ))}
         </View>
+
+        {Platform.OS === 'android' && (
+          <View style={styles.rate}>
+            <T style={styles.rateLead}>{'ホーム画面に置くと、\n次に曇る時刻がいつでも見られます。'}</T>
+            <PrimaryButton label="ホーム画面に置く" onPress={() => pinWidget().catch(() => {})} />
+          </View>
+        )}
 
         <View style={styles.rate}>
           <T style={styles.rateLead}>{'気に入っていただけたら、\n評価をいただけるとうれしいです。'}</T>

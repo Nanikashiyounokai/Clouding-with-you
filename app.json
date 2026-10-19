@@ -54,6 +54,28 @@
       "expo-sharing",
       "expo-background-task",
       [
+        "react-native-android-widget",
+        {
+          "fonts": [
+            "./assets/fonts/WidgetMincho.ttf",
+            "./assets/fonts/WidgetMinchoBold.ttf"
+          ],
+          "widgets": [
+            {
+              "name": "NextCloud",
+              "label": "曇天気の娘",
+              "description": "次に曇りそうな時刻",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000
+            }
+          ]
+        }
+      ],
+      [
         "expo-notifications",
         {
           "icon": "./assets/images/notification-icon.png",
