@@ -101,7 +101,7 @@
             "minSdkVersion": 29,
             "enableMinifyInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true,
-            "extraProguardRules": "# realm-js の JNI から名前で参照されるクラス（R8 で消すと起動時に落ちる）\n-keep class io.realm.react.** { *; }\n"
+            "extraProguardRules": "# realm-js の JNI から名前で参照されるクラス（R8 で消すと起動時に落ちる）\n-keep class io.realm.react.** { *; }\n# expo-task-manager が裏での取り直しのときに名前で読み込むクラス（消すと Android の裏の取り直しが動かない）\n-keep class expo.modules.adapters.react.apploader.** { *; }\n-keep class * implements expo.modules.apploader.HeadlessAppLoader { *; }\n"
           }
         }
       ],

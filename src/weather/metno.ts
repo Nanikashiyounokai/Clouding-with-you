@@ -13,6 +13,8 @@ import type { HourCloud } from '../domain/cloudPlan';
 export const METNO_URL = 'https://api.met.no/weatherapi/locationforecast/2.0/compact';
 export const METNO_USER_AGENT = 'clouding-with-you/2.0 (https://skart-inc.jimdofree.com/)';
 export const METNO_MIN_INTERVAL_MS = 10 * 60 * 1000;
+/** 応答が来ないまま待ち続けると、次の取り直しもすべて止まるので打ち切る */
+const TIMEOUT_MS = 15_000;
 
 /** 送る位置の細かさ。登録地点そのものではなく約 1km 四方の代表点を送る */
 export function coarse(v: number): number {
@@ -50,7 +52,9 @@ export async function fetchForecast(lat: number, lon: number, now: number, cache
 
   const headers: Record<string, string> = { 'User-Agent': METNO_USER_AGENT, Accept: 'application/json' };
   if (same && cached.lastModified) headers['If-Modified-Since'] = cached.lastModified;
-  const res = await fetch(`${METNO_URL}?lat=${la}&lon=${lo}`, { headers });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const res = await fetch(`${METNO_URL}?lat=${la}&lon=${lo}`, { headers, signal: ctrl.signal }).finally(() => clearTimeout(timer));
   const expiresHeader = Date.parse(res.headers.get('expires') ?? '');
   // Expires が無いときは 30 分後まで使う
   const expires = Number.isFinite(expiresHeader) ? expiresHeader : now + 30 * 60 * 1000;

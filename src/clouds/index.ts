@@ -124,6 +124,7 @@ async function run(askPermission: boolean): Promise<RefreshResult> {
   const lastFetchedAt = status === 'ok' && forecast ? forecast.fetchedAt : prev.lastFetchedAt;
   await schedule(point, plan, lastFetchedAt ? lastFetchedAt + STALE_AFTER_MS : null, now);
   await save({ plan, lastFetchedAt });
+  console.info(`clouds: ${status} plan=${plan.length}`);
   return { status, nextOnset: nextOnset(plan) };
 }
 
