@@ -1,10 +1,16 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 import { AdBanner } from '../ads/AdsProvider';
+import { useDialog } from '../components/Dialog';
 import { CloudButton, Sky } from '../components/ui';
+import { offerWidget } from '../widget/guide';
+
+/** 声かけ通知から開いたときのウィジェットの案内は 1 回だけ */
+const KEY_WIDGET_HINT = 'widgetHint.v1';
 
 /**
  * 曇り通知をタップしたらシェアカードを開く。
@@ -12,13 +18,32 @@ import { CloudButton, Sky } from '../components/ui';
  */
 function useNotificationRouting() {
   const last = Notifications.useLastNotificationResponse();
+  const dialog = useDialog();
   useEffect(() => {
     if (!last || last.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return;
     const data = last.notification.request.content.data as { url?: unknown; name?: unknown };
     if (data?.url === '/cloudy') {
       router.push({ pathname: '/cloudy', params: { name: typeof data.name === 'string' ? data.name : '' } });
+      return;
     }
-  }, [last]);
+    // 予報の取り直しが止まっていた人。開かなくても更新されるウィジェットを一度だけ勧める
+    if (data?.url === '/') {
+      AsyncStorage.getItem(KEY_WIDGET_HINT)
+        .then((shown) => {
+          if (shown) return;
+          AsyncStorage.setItem(KEY_WIDGET_HINT, '1').catch(() => {});
+          dialog.show({
+            title: 'また曇りをお知らせします',
+            message: 'ホーム画面に置いておくと、\n開かなくても予報が更新されます。',
+            buttons: [
+              { label: '置き方を見る', kind: 'primary', onPress: () => offerWidget(dialog.show) },
+              { label: '閉じる', kind: 'secondary' },
+            ],
+          });
+        })
+        .catch(() => {});
+    }
+  }, [last, dialog]);
 }
 
 export default function Home() {

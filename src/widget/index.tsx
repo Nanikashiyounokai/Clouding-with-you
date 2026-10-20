@@ -8,6 +8,9 @@ import { activePoint, type Point } from '../domain/points';
 import { KEYS } from '../storageKeys';
 import { NextCloudWidget, WIDGET_NAME, type WidgetData } from './NextCloudWidget';
 
+/** iOS のウィジェット（targets/widget）と共有する場所。app.json の entitlements と同じ */
+const APP_GROUP = 'group.com.skart.cloudingwithyou';
+
 async function readWidgetData(): Promise<WidgetData> {
   try {
     if (!(await AsyncStorage.getItem(KEYS.consent))) return { kind: 'start' };
@@ -15,7 +18,7 @@ async function readWidgetData(): Promise<WidgetData> {
     if (!point) return { kind: 'no-point' };
     const state = JSON.parse((await AsyncStorage.getItem(KEYS.cloudState)) ?? '{}') as { plan?: CloudAlert[] };
     const upcoming = (state.plan ?? []).map((a) => a.onsetAt).filter((t) => t > Date.now());
-    return { kind: 'point', name: point.name, nextOnset: upcoming.length ? Math.min(...upcoming) : null };
+    return { kind: 'point', name: point.name, lat: point.lat, lon: point.lon, nextOnset: upcoming.length ? Math.min(...upcoming) : null };
   } catch {
     return { kind: 'start' };
   }
@@ -23,8 +26,15 @@ async function readWidgetData(): Promise<WidgetData> {
 
 /** 予報を取り直したあとに呼ぶ。ウィジェットが置かれていなければ何もしない */
 export async function updateWidget(): Promise<void> {
-  if (Platform.OS !== 'android') return;
   const data = await readWidgetData();
+  if (Platform.OS === 'ios') {
+    // iOS のウィジェットは SwiftUI。地点と次に曇る時刻を共有の場所に書き、描き直してもらう
+    const { ExtensionStorage } = await import('@bacons/apple-targets');
+    new ExtensionStorage(APP_GROUP).set('widget', JSON.stringify(data));
+    ExtensionStorage.reloadWidget();
+    return;
+  }
+  if (Platform.OS !== 'android') return;
   await requestWidgetUpdate({ widgetName: WIDGET_NAME, renderWidget: () => <NextCloudWidget data={data} /> }).catch(() => {});
 }
 

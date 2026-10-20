@@ -1,10 +1,11 @@
 import * as WebBrowser from 'expo-web-browser';
-import { Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
 import { openStorePage } from '../review';
 import { colors } from '../theme';
-import { pinWidget } from '../widget';
+import { useDialog } from '../components/Dialog';
+import { offerWidget } from '../widget/guide';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
 /** 天気データの出典。CC BY 4.0 で、アプリ内に表示する決まり */
@@ -22,6 +23,7 @@ const STEPS = [
  * 2022 年以降どの画面にも出ておらず、新版にも持ち込まない（2026-10-07 決定）。
  */
 export default function About() {
+  const dialog = useDialog();
   return (
     <Sky>
       <Header title="このアプリについて" />
@@ -48,12 +50,10 @@ export default function About() {
           ))}
         </View>
 
-        {Platform.OS === 'android' && (
-          <View style={styles.rate}>
-            <T style={styles.rateLead}>{'ホーム画面に置くと、\n次に曇る時刻がいつでも見られます。'}</T>
-            <PrimaryButton label="ホーム画面に置く" onPress={() => pinWidget().catch(() => {})} />
-          </View>
-        )}
+        <View style={styles.rate}>
+          <T style={styles.rateLead}>{'ホーム画面に置くと、\n次に曇る時刻がいつでも見られます。'}</T>
+          <PrimaryButton label="ホーム画面に置く" onPress={() => offerWidget(dialog.show)} />
+        </View>
 
         <View style={styles.rate}>
           <T style={styles.rateLead}>{'気に入っていただけたら、\n評価をいただけるとうれしいです。'}</T>

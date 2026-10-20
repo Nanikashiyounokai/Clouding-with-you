@@ -7,7 +7,7 @@ export const WIDGET_NAME = 'NextCloud';
 export type WidgetData =
   | { kind: 'start' } // まだ同意していない
   | { kind: 'no-point' } // 祈願中の地点が無い
-  | { kind: 'point'; name: string; nextOnset: number | null };
+  | { kind: 'point'; name: string; lat: number; lon: number; nextOnset: number | null };
 
 const font = { regular: 'WidgetMincho', bold: 'WidgetMinchoBold' };
 /** theme.ts と同じ色。ウィジェットの型は色を文字列リテラルで受けるのでここに写す */

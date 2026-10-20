@@ -51,3 +51,4 @@ server/.dev.vars
 
 # Firebase の設定（公開リポジトリには置かない。EAS は環境変数 GOOGLE_SERVICES_JSON）
 google-services.json
+targets/*/Assets.xcassets

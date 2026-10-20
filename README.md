@@ -19,6 +19,9 @@
 - 予報を取り直すのは、アプリを開いたとき・祈願中の地点を変えたとき・裏で OS が動かしたとき
   （expo-background-task。Android は 30 分以上の間隔、iOS は OS しだい）。
   取り直しが 48 時間止まったら「しばらく空を見上げていません」と 1 回だけ声をかける
+- **ホーム画面ウィジェット**（次に曇りそうな時刻）。Android は `react-native-android-widget`（`src/widget/`）で、アプリからボタン 1 つで置ける。
+  iOS は WidgetKit（`targets/widget/`、`@bacons/apple-targets`）。iOS はアプリから置けないので置き方を案内する。
+  iOS のウィジェットは自分でも MET Norway の予報を取り、通知を予約し直す（アプリを開かなくても止まらないように）
 - 送る位置は登録した場所を小数 2 桁（約 1km）に丸めたもの。初回に説明画面で同意をもらう（`src/components/Consent.tsx`）
 - **曇り判定**：予報の雲量が 30% 以下（晴れ）から 70% 以上（曇り）に変わる 1 時間前に鳴らす（`src/domain/cloudPlan.ts`）。
   1 回の曇りにつき 1 回・鳴ったら 3 時間あける・1 日 3 回まで。**昼も夜も鳴らす**（天体観測にも使える）
@@ -41,6 +44,7 @@
 | 5 | iOS の Bundle ID | **決定** `com.skart.cloudingwithyou`。App Store Connect でのアプリ作成は人 |
 | 6 | アプリアイコン 1024px | **済**（デザイン原画から切り出し） |
 | 7 | Android の署名鍵を EAS に登録 | **人**：`~/Desktop/SKart/その他/Key.jks`。旧版と同じ鍵でないとアップデートにならない |
+| 9 | iOS ウィジェットの App ID と App Group | **人**：初回の `eas build -p ios` で Apple アカウントにログインすると、ウィジェット（`com.skart.cloudingwithyou.widget`）と App Group（`group.com.skart.cloudingwithyou`）が登録される。iOS 実機での見た目の確認も未 |
 | 8 | 両ストアのデータ申告・プライバシーポリシー | **人**：下書きは SKart/アプリ開発/01_曇天気の娘/2026-10-14_ストア申告の下書き.md |
 
 ## 開発
