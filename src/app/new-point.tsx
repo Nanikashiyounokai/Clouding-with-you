@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import MapView, { Marker, type MapPressEvent } from 'react-native-maps';
 
@@ -29,6 +29,14 @@ export default function NewPoint() {
   const { points, active, add } = useStore();
   const dialog = useDialog();
   const map = useRef<MapView>(null);
+  // 地名検索の途中で画面を離れたら、結果のダイアログを出さない（戻った先の画面に出てしまう）
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
   const [name, setName] = useState('');
   const [query, setQuery] = useState('');
   const [coord, setCoord] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -57,6 +65,7 @@ export default function NewPoint() {
       // Android の地名検索は位置情報の許可が要る
       if (Platform.OS === 'android' && !(await ensureLocationPermission())) return;
       const hits = await Location.geocodeAsync(q);
+      if (!alive.current) return;
       if (!hits.length) {
         dialog.show({ title: '見つかりませんでした', message: '別の言い方で探すか、\n地図をタップして選んでください。' });
         return;
@@ -64,6 +73,7 @@ export default function NewPoint() {
       place(hits[0].latitude, hits[0].longitude);
       if (!name.trim()) setName(q);
     } catch {
+      if (!alive.current) return;
       dialog.show({ title: '探せませんでした', message: '通信できる状態で\nもう一度お試しください。' });
     } finally {
       setBusy(null);
@@ -85,6 +95,7 @@ export default function NewPoint() {
         if (label) setName(label);
       }
     } catch {
+      if (!alive.current) return;
       dialog.show({ title: '現在地がわかりませんでした', message: '位置情報をオンにして\nしばらく待ってからお試しください。' });
     } finally {
       setBusy(null);
