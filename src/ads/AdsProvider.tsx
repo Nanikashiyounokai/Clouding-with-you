@@ -1,11 +1,23 @@
 import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import mobileAds, { AdsConsent, BannerAd, BannerAdSize, MaxAdContentRating } from 'react-native-google-mobile-ads';
 
 import { adUnits } from './config';
 
-const AdsReady = createContext(false);
+type Ads = {
+  /** 同意の確認と SDK 初期化が済んだ */
+  ready: boolean;
+  /** プライバシー オプション フォームを出す必要がある地域か（EEA など） */
+  privacyOptionsRequired: boolean;
+};
+
+const AdsCtx = createContext<Ads>({ ready: false, privacyOptionsRequired: false });
+
+/** 広告のための情報利用の同意を、あとから変えるフォーム */
+export function showAdPrivacyOptions() {
+  AdsConsent.showPrivacyOptionsForm().catch((e) => console.warn(e));
+}
 
 /**
  * 広告は画面下のバナーだけ（2026-10-15 実機テストで、起動時の全画面広告から変更）。
@@ -14,12 +26,14 @@ const AdsReady = createContext(false);
  */
 export function AdsProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
+  const [privacyOptionsRequired, setPrivacyOptionsRequired] = useState(false);
   useEffect(() => {
     if (!adUnits.banner) return;
     (async () => {
       try {
         try {
           const info = await AdsConsent.gatherConsent();
+          setPrivacyOptionsRequired(info.privacyOptionsRequirementStatus === 'REQUIRED');
           if (!info.canRequestAds) return;
         } catch (e) {
           // AdMob 側に同意メッセージが未設定だと失敗する。前回までの同意状況で判断して続ける
@@ -37,12 +51,17 @@ export function AdsProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  return <AdsReady.Provider value={ready}>{children}</AdsReady.Provider>;
+  const value = useMemo(() => ({ ready, privacyOptionsRequired }), [ready, privacyOptionsRequired]);
+  return <AdsCtx.Provider value={value}>{children}</AdsCtx.Provider>;
+}
+
+export function useAds(): Ads {
+  return useContext(AdsCtx);
 }
 
 /** 画面下のバナー。読み込めないときは場所を取らない */
 export function AdBanner() {
-  const ready = useContext(AdsReady);
+  const { ready } = useContext(AdsCtx);
   const [failed, setFailed] = useState(false);
   if (!ready || !adUnits.banner || failed) return null;
   return (

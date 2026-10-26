@@ -1,6 +1,7 @@
 import * as WebBrowser from 'expo-web-browser';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
+import { showAdPrivacyOptions, useAds } from '../ads/AdsProvider';
 import { BackToTitle, Header, PrimaryButton, Sky, T } from '../components/ui';
 import { openStorePage } from '../review';
 import { colors } from '../theme';
@@ -8,6 +9,7 @@ import { useDialog } from '../components/Dialog';
 import { offerWidget } from '../widget/guide';
 
 const SKART_URL = 'https://skart-inc.jimdofree.com/';
+const PRIVACY_URL = 'https://skart-inc.jimdofree.com/アプリケーション/曇天気の娘-プライバシーポリシー/';
 /** 天気データの出典。CC BY 4.0 で、アプリ内に表示する決まり */
 const METNO_LICENSE_URL = 'https://api.met.no/doc/License';
 
@@ -24,6 +26,7 @@ const STEPS = [
  */
 export default function About() {
   const dialog = useDialog();
+  const ads = useAds();
   return (
     <Sky>
       <Header title="このアプリについて" />
@@ -64,6 +67,15 @@ export default function About() {
           <T style={styles.creditText}>{'天気データ：ノルウェー気象局（MET Norway）\nCC BY 4.0'}</T>
         </Pressable>
 
+        <Pressable onPress={() => WebBrowser.openBrowserAsync(encodeURI(PRIVACY_URL)).catch(() => {})} accessibilityRole="link" style={styles.policy}>
+          <T style={styles.policyText}>プライバシーポリシー</T>
+        </Pressable>
+        {ads.privacyOptionsRequired && (
+          <Pressable onPress={showAdPrivacyOptions} accessibilityRole="button" style={styles.policy}>
+            <T style={styles.policyText}>広告のプライバシー設定</T>
+          </Pressable>
+        )}
+
         <Pressable onPress={() => WebBrowser.openBrowserAsync(SKART_URL).catch(() => {})} accessibilityRole="link" style={styles.logoWrap}>
           <T style={styles.made}>made by</T>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" accessibilityLabel="SKart" />
@@ -89,6 +101,8 @@ const styles = StyleSheet.create({
   rateLead: { fontSize: 14, lineHeight: 23, textAlign: 'center' },
   credit: { marginTop: 32 },
   creditText: { fontSize: 12, lineHeight: 20, textAlign: 'center', color: colors.whiteSoft },
+  policy: { marginTop: 14 },
+  policyText: { fontSize: 13, lineHeight: 20, textAlign: 'center', color: colors.whiteSoft, textDecorationLine: 'underline' },
   logoWrap: { alignItems: 'center', marginTop: 24, marginBottom: 16 },
   made: { color: colors.ink, fontSize: 11, lineHeight: 16 },
   logo: { width: 120, height: 38 },
