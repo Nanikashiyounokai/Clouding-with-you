@@ -18,8 +18,10 @@ function when(at: number, now = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0');
   const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
   const diff = Math.round((day(d) - day(now)) / 86_400_000);
-  const date = diff === 0 ? '今日' : diff === 1 ? '明日' : `${d.getMonth() + 1}月${d.getDate()}日`;
-  return `${date} ${p(d.getHours())}:${p(d.getMinutes())}ごろ`;
+  const time = `${p(d.getHours())}:${p(d.getMinutes())}ごろ`;
+  if (diff === 0 || diff === 1) return `${diff === 0 ? '今日' : '明日'} ${time}`;
+  // 幅が足りず「ご／ろ」で折り返すので、日付のあとで改行する
+  return `${d.getMonth() + 1}月${d.getDate()}日\n${time}`;
 }
 
 export function NextCloudWidget({ data }: { data: WidgetData }) {
@@ -56,10 +58,10 @@ export function NextCloudWidget({ data }: { data: WidgetData }) {
         <TextWidget
           text={main}
           maxLines={2}
-          style={{ fontFamily: font.bold, fontSize: big ? 22 : 15, color: colors.white, marginTop: big ? 2 : 8 }}
+          style={{ fontFamily: font.bold, fontSize: big ? 18 : 15, color: colors.white, marginTop: big ? 2 : 8 }}
         />
       </FlexWidget>
-      <ImageWidget image={require('../../assets/images/cloud_button.png')} imageWidth={84} imageHeight={30} />
+      <ImageWidget image={require('../../assets/images/cloud_button.png')} imageWidth={64} imageHeight={23} />
     </FlexWidget>
   );
 }
