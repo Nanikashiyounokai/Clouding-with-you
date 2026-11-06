@@ -10,7 +10,7 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.skart.cloudingwithyou",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
