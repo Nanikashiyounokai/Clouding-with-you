@@ -1,0 +1,17 @@
+# 曇天気の娘 — 曇り通知サーバー
+# デプロイ前に人がやること（README 参照）:
+#   1. npx wrangler d1 create clouding-with-you → 出てきた database_id を下に書く
+#   2. npx wrangler d1 execute clouding-with-you --remote --file=schema.sql
+#   3. npx wrangler secret put OPENWEATHER_API_KEY
+name = "clouding-with-you"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[triggers]
+# 2026-10-19 停止：アプリがスマホから直接 MET Norway の予報を取る形に変えた
+crons = []
+
+[[d1_databases]]
+binding = "DB"
+database_name = "clouding-with-you"
+database_id = "d9d22e13-09c6-4572-bbd5-7d4e59d9e846"
